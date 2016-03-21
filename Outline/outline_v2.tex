@@ -1,0 +1,174 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage{amsmath,amsfonts,amsthm,amssymb,amscd}
+\usepackage[top=0.5in, bottom=0.5in, left=0.5in, right=0.5in] {geometry}
+%\usepackage{fixltx2e}
+\usepackage[numbers]{natbib}
+\usepackage{enumitem}
+
+\newcommand{\tab}[1]{\hspace{.2\textwidth}\rlap{#1}}
+
+\begin{document}
+\title{Computation in the Wild: Reconsidering Dynamic Systems in Light of Irregularity}
+\author{Tony Liu}
+\maketitle
+
+\section*{Thesis Outline}
+
+\subsection*{Introduction}
+\begin{itemize}
+\item Motivating example: \citeauthor{pe04}'s plant cell stomatal coordination
+\item Metrics: \citeauthor{la90}'s $\lambda$ and measures of robustness
+\end{itemize}
+
+\subsection*{Previous Work}
+\begin{itemize}
+
+\item Motivation and Applications
+\begin{itemize}
+\item Stomatal Patchiness
+\item Inspiration for Novel Computing Models
+\end{itemize}
+
+\item Criticality and the Emergence of Computation
+\begin{itemize}
+\item Edge of Chaos
+\item Metrics
+\end{itemize}
+
+\item Robustness in Face of Irregularity
+\begin{itemize}
+\item Redundancy in Decentralized Systems
+\item Alternative Spatial Representations of CA (Penrose, Voronoi)
+\end{itemize}
+\item Summary
+
+\end{itemize}
+
+\subsection*{Adapting Criticality Measures to Irregular Grids}
+\begin{itemize}
+
+\item $\lambda$ Rule Table Mappings to Irregular Grids
+\begin{itemize}
+\item Preserving ``directionality'' with both Moore and von Neumman neighborhoods
+\item Mapping variable neighborhood sizes to the fixed neighborhood sizes of $\lambda$ rule tables
+\end{itemize}
+
+\item Transition Rule Mappings to Irregular Grids
+\begin{itemize}
+\item Conway's Life: weighting neighborhood influence by Euclidean distance or edge length
+\item Mapping Local Majority and 2DGKL transition rules to variable neighborhood sizes
+\end{itemize}
+
+\end{itemize}
+
+\subsection*{System Design}
+\begin{itemize}
+
+\item Grid Generation
+\begin{itemize}
+\item Control over density, periodicity, and orientation of generated grids
+
+\item Delaunay Triangulation/Voronoi Diagrams
+
+\item Penrose Tilings (Thin/Thick Rhombs and Kites/Darts)
+
+\item Voronoi Quadrilaterals
+
+\item Controlled Degradations of Grids
+\end{itemize}
+
+\item Stencil Mapping
+
+\begin{itemize}
+\item Translation between regular and irregular Rule Table Transitions
+
+\item Orientation-Based Stencils
+
+\item Distance-Based Stencils
+\end{itemize}
+
+\item Simulation (Optimizations)
+
+\item Reference to Code?
+
+\end{itemize}
+
+\subsection*{Experimental Setup and Goals}
+\begin{itemize}
+
+\item Voronoi Diagrams
+\begin{itemize}
+\item GoL: Do we see an increased difficulty for supporting coherent Game of Life structures on Voronoi diagrams?
+\item *Testing Interconnectivity: Are there differences in CA behavior on Voronoi grids simply due to different average connectivity or because of other properties?
+\item *Equivalence Classes: Can some equivalence between neighborhood definitions of regular and irregular grids be established?
+\end{itemize}
+
+\item Penrose Life
+\begin{itemize}
+\item Can we replicate the results of \citeauthor{hi05} and \citeauthor{ow10}?
+\item Are there discernible differences in CA behavior between periodic and aperiodic tilings?
+\end{itemize}
+
+\item Majority Task
+\begin{itemize}
+\item Do CA rule tables that solve the majority task on regular grids robustly still do so on irregular grids?
+\item *Do the same effects of temporal and spatial noise \citeauthor{me07} aiding task performance occur within the irregular grids?
+\end{itemize}
+
+\item Lambda 
+\begin{itemize}
+\item Do we see sharp ``phase transition'' regions in lambda-entropy experiments on irregular grids similar to the results on regular grids?
+
+\item What impact, if any, do boundary conditions (periodic vs. ``dead'') impact measurements of $\lambda$ and entropy?
+\end{itemize}
+
+\end{itemize}
+
+\subsection*{Results}
+
+\begin{itemize}
+\item Majority Task
+\begin{itemize}
+\item Initial results show that local majority task performance on irregular Voronoi diagrams are equivalent to local majority task performance on regular grids
+\end{itemize}
+
+\item Penrose Life
+\begin{itemize}
+\item Replication of Penrose experiments on both Kite/Dart and Thin/Thick Rhombus Penrose tilings agree with the results produced by \citeauthor{ow10}
+\item Initial results indicate both a quantitative and qualitative difference between Kite/Dart and Rhomb grids in terms of oscillating structures, ash, and average lifetimes
+\end{itemize}
+
+\item Lambda
+
+\begin{itemize}
+\item Replication of Lambda entropy experiments agree with results produced by \citeauthor{wo90}
+
+\item Lambda entropy experiments on irregular grids yield results that appear to correspond to behavior seen on regular grids
+\end{itemize}
+
+\end{itemize}
+
+\subsection*{Discussion}
+
+\begin{itemize}
+
+\item Quantitative Comparison between Irregular and Regular Grids
+\begin{itemize}
+\item Impacts of variations of neighborhood size on task performance of cellular automata
+
+\item Rough equivalence between regular grids and irregular grids in entropy, lambda measurements
+\end{itemize}
+
+\item Robustness and Viability of Irregular Grids
+\begin{itemize}
+\item Irregular grids handling ``dead'' boundary conditions
+\end{itemize}
+
+\item Future Work
+
+\end{itemize}
+
+\bibliographystyle{plainnat}
+\bibliography{../Liu_References}
+
+\end{document}

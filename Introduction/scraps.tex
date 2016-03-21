@@ -1,0 +1,120 @@
+TODO tip to Peak?
+Suppose you want to model computation on a leaf. What does this mean? Can use this as a backbone for the rest of the related work.
+
+It is also important to consider computation in cellular automata from differing perspectives. The typical view is that the initial configuration of a CA is “data” and that the transition functions are computing based on that data. However, a second view is that the initial configuration is the computer itself, and the transition rules simply describe the ``physics'' of how the system operates.
+
+$\lambda=\frac{K^{N-n}}{K^n}$ where $K$ is the number of possible cell states, $N$ is the number of neighbors, and $n$ is the number of transitions to a particular quiescent state $s_q$.
+
+Unsurprisingly, as the number of neighbors tends towards $\infty$ the transition point approaches $\lambda=0$ as CAs immediately enter a chaotic state when the number of neighbors grow large.
+
+We define the probability distribution required for the calculation of Shannon entropy by the frequency of cell state occurrences across the spatial configuration in many time steps.
+
+The bins are a result of ``symmetry breaking'' during the genetic algorithm’s selection process; once a population discovers that a good strategy is to expand blocks of 0s (or 1s), there is a genetic drift towards those particular rules. Thus the two bins emerge from particular runs that break symmetry in one direction, and others that break symmetry from the other direction. This idea of drift prevents the genetic algorithms to find more optimal solutions that are perfectly symmetric.
+
+as correlations between phase transitions and rich complex behavior are frequently observed 
+
+long-range coordination of stomata cannot be very important for optimal gas exchange
+
+outlines four tenets of control and ``self-awareness:'' global information is encoded as statistics and dynamics over the system’s components, randomness and probabilities are required, a fine-grained and parallel search is executed across the system, and an interplay of bottom-up and top-down processes are required.  We see that local ``self-interpretation'' of information as being a critical component of facilitating complex behavior such as self-regulation. 
+
+A regular lattice places arbitrary bounds on the potential ``occupancy'' of a cell, which must be appropriately scaled to the phenomenon being modeled. 
+
+
+Life on Penrose tiles also tend to give rise to compact long-period oscillators.
+
+With the irregular nature of Penrose tilings, boundary conditions become more difficult to handle. Hill et al. address this by placing permanently “dead” cells on the border of the grid, effectively bounding the grid. An alternative could have been to play Life on “infinite” grids that lazily expanded whenever cells began to leave the boundaries of the original grid; this may yield differing results in the final configurations of the cells.
+
+
+where the rule tables, local connectivity, and spatial configurations are
+
+maybe there is some sort of equivalence, or maybe we're dealing with a separate class of dynamical systems, with new metrics, new everything that needs to be defined
+
+Can take a look at an example: hashlife. ``exploiting regularities.'' at first glance there seems to be no good way to exploit the same sort structure within spatially irregular systems. But what if there is? What if there is some form of functional equivalence between the regular lattice and irregular spatial configurations? Not a proof, but evidence that a equivalence relation could be established. 
+
+The goal of this work is to take some first steps in resolving this fuzziness, to begin to examine the fundamental differences between natural distributed systems and the CA systems traditionally explored. 
+
+Doing so would allow us to do the safely map thing of computational models onto nature
+
+\makeatletter
+\def\@makechapterhead#1{%
+  \vspace*{50\p@}%
+  {\parindent \z@ \raggedright \normalfont
+    \interlinepenalty\@M
+    \Huge\bfseries  \thechapter.\quad #1\par\nobreak
+    \vskip 40\p@
+  }}
+\makeatother
+
+\section{Applications}
+\begin{itemize}
+\item pe04, mo07, we11, me07 (stomatal patchiness)
+
+\item fl01, he98 (sociology)
+\item bi07 (ecology)
+\item sh00 (TODO)
+
+\item ma96, CAM-8 CA-based architecture*
+\item si99, Emergence of Cellular Computing
+\item mi96, Review of CA
+\item ak14, Indefinitely Scalable Computing*
+\end{itemize}
+
+\section{Criticality}
+\begin{itemize}
+\item la90, Edge of Chaos
+\item wo90, Sharp phase transition
+\item mi93, Revisiting Edge of Chaos (Idea of filtering)
+\end{itemize}
+
+\section{Metrics}
+\begin{itemize}
+\item la90, Edge of Chaos
+\item li90b, Transition Phenomena ($\gamma$, Hamming distance)
+\item we04, Comparing the dynamics of stomatal networks
+\item cr95, Evolution of emergent computation (filtering)
+\item cr93, Pattern Bases (TODO read)
+\item rk06, Hashlife (Rockicki) (?)
+\item gs84, Hashlife (Gosper) (?)
+\end{itemize}
+
+\section{Robustness}
+\begin{itemize}[noitemsep, nolistsep]
+\item me07, Noise in stomatal networks*
+
+\item mi05, self-awareness in decentralized systems*
+
+\item si04, Studying Fault Tolerance in Evolved CA
+\item ak14, MFM
+\item si98, Nonuniform CA
+
+\item to05, Evolution and Dynamics of Small-World Cellular Automata (TODO read)
+\end{itemize}
+
+\section{Modeling/Topology}
+\begin{itemize}[noitemsep, nolistsep]
+\item fl01, Do Irregular Grids Make a difference? (Sociology)
+\item bi07, Escape from the Cell (Ecology)
+
+\item hi05, Penrose Life
+\item ra11, SmoothLife
+
+\item fl01, Do Irregular Grids Make a difference? (Sociology)
+\item wh03, Voronoi Distributed GA
+\item sh00, GIS Voronoi CA
+
+\item rk06, Hashlife (Rockicki) (?)
+\item gs84, Hashlife (Gosper) (?)
+\end{itemize}
+
+\section{Evolution}
+\begin{itemize}
+\item ta01, Creativity in Evolution
+\item rk06, Hashlife (Rockicki)
+\item gs84, Hashlife (Gosper)
+\item ho92, Genetic Algorithms
+\item hu07, Evolvable A-Chem
+\item cr95, Evolution of emergent computation (filtering)
+\item da86, blind watchmaker
+\end{itemize}
+
+

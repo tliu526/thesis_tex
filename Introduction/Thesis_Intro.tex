@@ -1,0 +1,424 @@
+\documentclass[a4paper,11pt]{report}
+\usepackage{amsmath,amsfonts,amsthm,amssymb,amscd}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in] {geometry}
+%\usepackage{fixltx2e}
+\usepackage[numbers]{natbib}
+\usepackage{enumitem}
+\usepackage{setspace}
+\usepackage{todonotes}
+
+\usepackage[titletoc, title]{appendix}
+\renewcommand{\appendix}{%
+  \par
+  \setcounter{section}{0}%
+  \renewcommand{\thesection}{\thechapter.\Alph{section}}%
+}
+
+%graphicx
+\usepackage{graphicx}
+\graphicspath{{../Figures/}}
+
+%endfloat
+\usepackage[nomarkers,nofiglist,fighead]{endfloat}
+\renewcommand{\efloatseparator}{\mbox{}}
+
+
+\onehalfspacing
+
+\newcommand{\tab}[1]{\hspace{.2\textwidth}\rlap{#1}}
+
+\begin{document}
+
+
+
+\title{Computation in the Wild: Reconsidering Dynamic Systems in Light of Irregularity}
+%TODO Spatial Irregularity?
+
+\author{Tony Liu}
+\maketitle
+\listoffigures
+% for chapter headings
+
+
+%TODO
+%\chapter*{Abstract}
+
+\chapter{Introduction}
+\label{ch:Intro}
+Dynamic natural systems have the ability to perform complex tasks that resemble computation, often without the aid of a central processing unit. In particular, spatial systems that are only locally connected, such as plant cell arrays or single-agent populations, can produce emergent, globally-coordinated behavior~\cite{bi07, mo07}. These systems are of particular interest because of their massive parallelism and fault tolerance within noisy, imperfect environments~\cite{si99}. Decentralized dynamic systems can be described and modeled using cellular automata (CA) because of CA's ability to support complex behavior arising from simple components and strictly local connectivity~\cite{mi96}. The goal with CA models is to able to examine how and under what conditions global, distributed computation emerges in such systems.
+
+One of the main motivating examples of emergent natural computation we have been examining is plant cell stomatal coordination. These dynamic pores control gas exchange within the plant and ``solve'' a constrained optimization problem without a central communication system. What is remarkable about stomata is that their behavior is statistically indistinguishable from the behavior of CAs that solve the \textit{majority problem}: a global coordination task where all cells in the CA need to converge to the majority state of the initial  configuration~\cite{mo07,pe04, we11}. Furthermore, the corresponding majority task automata have been shown to respond robustly in the face of variations in their environment such as state noise, much like their biological counterparts~\cite{me07}. This relationship is exciting because it has been shown that computation in CAs can only occur under specific conditions, existing at a \textit{critical point} between ordered and chaotic behavior~\cite{la90, wf86}. Thus, perhaps we could begin to understand how computation emerges in nature given their established connection with CAs. However, the automata models built to study natural systems like plant stomata make a potentially limiting assumption: regularity of both the cellular grid and the local connections. Dynamic systems in nature certainly do not appear in a uniformly connected lattice. Like their surrounding environment, the spatial orientation of these systems are noisy and prone to irregularities. While some work has been done to see the effects of nonuniform grids such as Voronoi diagrams or Penrose tilings on automata performance~\cite{ca06,fl01,hi05}, further study is needed to ensure that our models of computation can safely be ``mapped'' to the systems occurring in nature.
+
+With these considerations in mind, this work would pursue a deeper exploration of irregular computing CAs. We plan on conducting a series of experiments on a spectrum of automata with irregular grids and connectivities, quantifying their behavior and comparing them to traditional CAs. As noted earlier, computation appears to emerge at a point of criticality somewhere in between the ordered and chaotic automata and \citeauthor{la90}'s $\lambda$ parameter, representing the relative order of a CA, is used to parametrize the possible automata space~\cite{la90}. $\lambda$ is important because it is an indicator of the class of CAs that have the ability to compute~\cite{wo90}. However, this measure is tuned specifically for static neighborhood definitions and uniform grids. With the experimentation on irregular automata, the goal is to explore and develop a more general notion of $\lambda$ and other metrics so that we can better understand and perhaps even quantify the conditions in which computation can emerge in noisy systems. Another important question we hope to address with this work is whether there is a qualitative difference between regular and irregular grid patterns and connectivities: are there cases where uniform CA models are sufficient for representing biological systems? 
+% As materiality is also a characteristic of natural systems that typical automata models neglect~\cite{hu07}, we plan on conducting experiments on material-constrained CAs as well. 
+
+We believe that the study of CA behavior in irregular environments is critical to achieve a greater understanding of how biological systems combat imperfections. Ultimately, the contribution of work on natural computational systems is twofold: not only can we achieve a better understanding of how some biological processes operate, but knowledge of how these systems work can inspire alternative computing methods~\cite{ma96, si04}. The hope is to illuminate how nature is able to perform complex computation in noisy environments and apply these lessons to advance future computing models.
+
+We will begin with a review of previous work in Chapter \ref{ch:Prev}, spanning the concepts of criticality, robustness, and spatial representations in computing dynamic systems and examining the potential applications of such models. 
+
+\chapter{Previous Work}
+\label{ch:Prev}
+
+Why are we interested in distributed computational CA systems? The goal is to achieve a better understanding of how computation naturally emerges from such systems in order to accurately model biological distributed processes as well as improve our technological computing models. We will begin with some motivating examples by considerings previous work on applications of robust, distributed CA models, spanning topics such as plant biology, population dynamics, geographic modeling, and computer architecture. However, in order to effectively apply CA models of natural systems, we must understand what computation means in such dynamic systems. Are there requisite properties of computation, and if so how do they arise? For this we consider a collection of papers that develop a framework for quantifying computational characteristics as well as present a hypothesis that computation emerges at the ``edge of chaos.'' Next, as we need to understand how natural computation is robust in the face of noisy and irregular environments, we will examine work on noise and fault tolerance in distributed automata systems. Finally, spatial irregularity is a prevalent feature in nature that is often overlooked in such studies, so we consider some work that examines the impact of such irregularity on dynamic CA systems.
+
+\section{Motivation and Applications}
+\label{sec:Motiv}
+\subsection{Cellular Automata for Biological Modeling: Stomatal Patchiness}
+\label{subsec:Stoma}
+An important motivating example for this work is the modeling of plant cell stomatal coordination done by \citeauthor{pe04}. Plant stomata are dynamic pores distributed across leaves that control gas exchange via the opening and closing of their apertures. These stomata solve a constrained optimization problem, as they must maximize the uptake of CO\textsubscript{2} while minimizing water vapor loss~\cite{mo07,we11}. Long believed to be autonomous units that respond similarly but independently to environmental conditions, it has now been shown that a stoma's aperture is also dependent on interactions with neighboring stomata, sometimes producing coordinated behavior called \textit{stomatal patchiness}, where large groups of stomata uniformly open or close~\cite{pe04}. This phenomenon is poorly understood by biologists, due to its apparent negative impact on gas exchange optimization as well as its highly variable behavior. However, with biological evidence that plant stomata interact locally~\cite{pe04}, task-performing cellular automata are suitable candidates for modelling patchy stomatal conductance. In fact, modeling has shown that the stomatal systems are statistically indistinguishable from CAs configured to solve the \textit{majority task} or \textit{consensus problem}, which involves determining which state (0 or 1, open or closed) is the majority state in the initial configuration and then converging all cells to that state (Figure \ref{fig:maj_task})~\cite{gr15}. Qualitative comparisons yield similarities to these task-performing automata as well (Figure \ref{fig:ca_stoma}). The patchiness observed in the plant stomata are analogous to transient periods that are essential for the computation of majority in CAs. What is remarkable about these stomatal systems is their response to irregularity, as they must manage highly variable and imperfect environments. The corresponding majority task CAs have been shown to respond robustly in the face of state noise, imperfect information transfer, and transition rule heterogeneity; in fact, task performance is enhanced in some cases by the presence of noise~\cite{me07}.
+
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=1.0\textwidth]{maj_task.png}
+	\caption[Majority Task CA]{
+	An illustration of a majority task cellular automata correctly classifying the majority initial state by converging to black. Figure from \citeauthor{mo07}~\cite{mo07}.
+	}
+	\label{fig:maj_task}
+\end{figure}
+
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=0.75\textwidth]{ca_stoma_comparison.png}
+	\caption[Qualitative CA-Stomata Comparison]{
+	The left image illustrates coherent state patchiness in a majority task cellular automata. The right image illustrates a similar patchiness for stomata in the plant \textit{Xanthium strumarium L}. Figure from \citeauthor{me07}~\cite{me07}.
+	}
+	\label{fig:ca_stoma}
+\end{figure}
+
+It is important to note however that none of these systems are guaranteed to optimally solve the majority task, and even determining whether or not a single instance will perform optimally is hard. The inherent difficulty of determining the success or failure of a given task-performing network emphasizes the importance of information granularity; in an appeal to the concept of self-organizing criticality~\cite{ba88}, small pieces of fine grain information about initial configurations may lend more insight to the global behavior of a distributed network than large but coarse bodies of information about the structure of the space. Thus, studying stomatal patchiness not only provides a step towards connecting computation to phenomenon in nature but also illustrate the central ideas of robustness and criticality.
+
+\subsection{CA Models of Social and Ecological Dynamics}
+
+Researchers in ecology and the social sciences often use CA models when modeling dynamics because automata models encapsulate essential features of many real-world processes. The discrete and distributed nature of CA system provide a tractable system where agents (represented by individual cells) can interact in local and overlapping neighborhoods~\cite{he98,bi07}. In particular, the local interconnections present in cellular automata models illuminate how micro-level rules can give rise to certain macro-level effects, a crucial aspect of domains such as population dynamics. Because the micro/macro relations are readily apparent in CA systems, scientists in these fields can utilize such models to not only produce quantitative simulations and predictions in but also to achieve a qualitative understanding of how the real world operates~\cite{he98}. Cellular automata are appealing because they take a ``simplistic'' approach to 
+``complex'' modeling, which not only is useful in domains where details on the underlying mechanisms are not well understood (such as animal herd movement or forest fire behavior) but also reduces multi-agent systems to their fundamental one-on-one interactions~\cite{bi07,ca06}, again alluding to the importance of fine-grain information when trying to understand coarse-grain processes. 
+
+Scientists in these fields recognize the limitations of CA models as well, as there are concerns that the discrete and uniform nature of these systems are potentially prohibitive in providing a sufficiently accurate representation of the real-world phenomena they are trying to model. In particular, there is a need for variability in both the spatial construction of the modeling environment as well as the local relationship between cells~\cite{fl01} that the regular lattice structure of traditional cellular automata do not provide. We will consider these limitations as well as work on alternative spatial configurations in more detail in Section~\ref{sec:Model}.
+
+\subsection{Cellular Automata as Inspiration for Novel Computing Models}
+
+Additionally, distributed CA systems have provided inspiration for new forms of computing. Computing models based on cellular automata are founded upon three fundamental principles: simplicity, ``vast parallelism'', and locality~\cite{si99}. Similar to the appeal of automata systems in dynamic modeling, CA-based computers utilize simple ``cellular'' computational units in tandem to solve complex computational tasks, can invoke parallelism on a scale that traditional parallel systems cannot achieve, and have better fault containment as well as more tolerance of imperfect input and execution due to strictly local connectivity.
+
+An example of such a cellular-based computing is the CAM-8 architecture developed by \citeauthor{ma96}. The CAM-8 computer architecture is motivated by the idea that in order to maximize computational density, the underlying structure of the computer must mimic the basic spatial locality of physical law~\cite{ma96}. Thus, the architecture is mesh network of local CA ``compute nodes'' as they accurately represent the local interconnectivity that is present in real-world micro-physical systems. As a result, there is a correspondence between how computation is performed under the architecture and the physical implementation of the system itself. Because of this adherence to physical law, the CAM-8 architecture is particularly capable of computing spatially moving data, ideal for particle simulation and medical imaging, among others~\cite{ma96}. The goal with CAM-8 and other distributed cellular computing models is not necessarily to replace serial computers, but rather to find particular domains of problems where these alternative computing models can excel in and perhaps surpass traditional computing models.
+
+These cellular-based computing architectures are not without their own limitations. One of the main challenges in cellular computing is being able to find local interaction rules that express the overall problem that needs to be computed. There is no good way to abstract beyond the local CA rules to provide a high-level interface for programmers to develop in, making deliberate and controlled global behavior difficult to produce. Indeed, this is the main barrier CAM-8 must overcome with in order to become a viable and practical computer architecture. There is also an issue of scalability; scaling grid size does not necessarily bring about performance scaling or even task scaling: whether or not the same level of performance on the task is maintained~\cite{si99}. Nevertheless, the potential applications in building cellular-based computational models illustrate the promise of examining robust distributed computation in natural CA-like systems.
+
+\section{Criticality and the Emergence of Computation}
+\label{sec:Crit}
+
+\subsection{Foundations of Computation in Dynamical Systems}
+
+What are the requisite conditions for computation to emerge from a dynamical system?
+It has been shown that various CA systems can support universal computation~\cite{wf86}, but what are the particular characteristics that allow for computation to be possible?
+Computational constructs such as Turing machines and other equivalent entities are built upon three fundamentals that can be formulated in the dynamics of a CA system. The system must be able to support the \textit{storage} of information, with the ability to preserve information for arbitrary time periods. Information \textit{transmission} across arbitrarily long distances must also be possible in the environment. Finally, there must be some mechanism for information \textit{interaction} with the potential for information to be transformed or modified~\cite{la90}. These properties are necessary for any dynamical system, automata or otherwise, to have the capacity for computation, but are not sufficient to give rise to computation by their presence alone.
+\citeauthor{la90} also establishes the notion of dynamical systems undergoing ``physical'' phase transitions between highly ordered to highly disordered dynamics, with the most interesting behavior occurring within the boundaries of this transition. This transition region is also where the three requisite properties of computation often occur. Thus, the hypothesis \citeauthor{la90} claimed is that computation can spontaneously emerge and dominate the dynamics of a physical system when such a system is at or near such a ``critical transition'' point~\cite{la90}. 
+
+\subsection{Metrics}
+
+Throughout the pursuit of understanding computation in dynamical CA systems, many metrics have been utilized and created that can help quantify particular computational characteristics. We will touch on and present some of them here, with equations listed in Appendix \ref{app:Defs}.
+
+\medskip
+
+We will begin with a formal definition of a cellular automaton~\cite{la90}. A CA is composed of a lattice of dimension $D$ with a finite automaton present in each cell of the lattice. There is a finite neighborhood region $\mathcal{N}$, where $N = |\mathcal{N}|$ is the number of cells covered in the neighborhood region. Typical neighborhood stencils for two-dimensions are the five-cell \textit{von Neumann neighborhood} and the nine-cell \textit{Moore neighborhood} (Figure \ref{fig:neighborhoods}). Each cell contains a finite set of cell states $\Sigma$ of size $K = |\Sigma|$ and a transition function $\Delta$, which maps a set of neighborhood configurations to the cell states: $\Delta: \Sigma^N \to \Sigma$. We typically characterize a particular class of cellular automata by the number of neighbors $N$ and the number of cell states $K$. 
+
+\begin{figure}[thp]
+\centering
+\includegraphics[width=0.75\textwidth]{mi96_fig3_neighborhoods}
+\caption[CA Neighborhood Stencils]{
+	(a) is the five-cell von Neumann neighborhood, (b) is the nine-cell Moore neighborhood. The gray cell is the one to be updated by a transition rule. Figure from \citeauthor{mi96}~\cite{mi96}.
+}
+\label{fig:neighborhoods}
+\end{figure}
+
+\medskip
+
+\citeauthor{wf84} proposed a qualitative method for classifying CA automata behavior, with systems falling into one of four classes~\cite{mi96,wf84}:
+\begin{itemize}[noitemsep, nolistsep]
+\item Class I: All initial configurations relax to the same fixed, homogeneous state.
+\item Class II: The CA relaxes to simple periodic structures, perhaps dependent on the initial configuration.
+\item Class III: Most initial configurations degenerate to chaotic, unpredictable behavior.
+\item Class IV: Some initial configurations result in complex localized structures that have the potential to be long-lived.
+\end{itemize}
+\citeauthor{li90b} later expands to six categories, with Class I and Class II both split into more specific subclasses. Though these are broad, rough categorizations, we expect Class IV to be the category of interest when examining potential capacity for computation in cellular automata.
+
+\medskip
+The parameter $\lambda$ (Appendix \ref{appA:lambda}) as established by \citeauthor{la90} is used to both narrow the space of CAs to consider as well as to measure the relative homogeneity or heterogeneity of a CA rule table: a completely homogeneous rule table maps all entries to a single ``quiescent'' state whereas a completely heterogeneous rule table maps entries to random states~\cite{la90}. $\lambda$ is the fraction of the number of non-quiescent mappings in a given rule table, and can be thought of the ``average'' amount of order a given automata transition rule set possesses. Thus, $\lambda$ values range from $0$, which represents a completely homogeneous rule table to $1 - \frac{1}{K}$, which represents a completely heterogeneous table. There is also a notion of ``critical'' $\lambda$, denoted $\lambda_c$, where the most complex dynamics tend to emerge. $\lambda_c$ and idea of criticality will be examined in more detail in Section \ref{subsec:edge_chaos}. The hypothesized relationship between $\lambda$ and Wolfram's complexity classes can be seen in Figure \ref{fig:wolfram}.
+
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=0.75\textwidth]{wolfram_classes.png}
+	\caption[Wolfram's Complexity Classes]{
+	The hypothesized relationship between $\lambda$ and complexity. Class IV CAs would only appear at critical levels of $\lambda$. Figure from \citeauthor{la90}~\cite{la90}.
+	}
+	\label{fig:wolfram}
+\end{figure}
+
+\medskip
+
+The statistical quantity $\gamma$ (Appendix \ref{appA:gamma}) developed by \citeauthor{li90b} is another metric that describes the average asymptotic motion or spreading rate of the \textit{difference pattern} in a CA. The difference pattern is a measurement of how two different configurations on a automata lattice become either more different or more similar when applying transitions from the same rule table~\cite{li90b}. $\gamma$ can roughly be seen as the ``variance'' to $\lambda$'s ``mean'' when considering the relative order or chaos, as $\gamma$ provides finer-grain information about the dynamics of particular CA that may not be distinguishable when only considering $\lambda$.
+
+\medskip
+
+A common quantity used to measure the relative order in a CA system is \textit{Shannon entropy}, denoted by $H$ (Appendix \ref{appA:entrop})~\cite{la90,li90a,wo90}. We can think of Shannon entropy as measuring the amount of information present in the CA space based on the frequency of cell state occurrences; there is less information in ordered systems and more in disordered systems. Thus a completely homogeneous rule table will yield an entropy of $H = 0$ while a completely heterogeneous rule table will yield the maximum entropy possible for that particular $(N,K)$ class of automata. A natural extension to this measure is \textit{mutual information} (\ref{appA:mut_info}), defined as the correlation between two individual cell entropies~\cite{la90}. We expect some amount of mutual information being shared across cells in order for computation to be supported; too little shared information degenerates to chaotic behavior, while too much mutual information creates highly correlated structures that are too rigid to support computation.
+
+\medskip
+
+\textit{Mean field theory} from the description of many-body systems in physics is often used to approximate a number of the metrics described above~\cite{li90b,wo90}. The idea is to quantify a many-body system not by considering all mutual two-body interactions (which may become intractable), but rather to describe the interaction of one particle with the the rest of the system by an ``average potential'' created by the other particles. This approximation technique is particularly useful when considering classes of automata in the limit, such as in the analysis performed by \citeauthor{wo90}. Approximations for $\lambda_c$, $\gamma$, and $H$ using mean field theory can be found in Appendix \ref{appA:MFT}.
+
+% TODO MFT citation
+
+% TODO Peak statistics (Power Law, etc)
+
+% TODO pattern bases definitions?
+
+% TODO closing paragraph something along the lines of: these are some ``traditional'' methods for evaluating discrete/uniform CAs. Part of this work is finding more accurate measures when the objects of analysis are not regular, where patterns and structure cannot be utilized as a foundation for the metrics. 
+
+\subsection{The Edge of Chaos: Investigating where Computation Emerges}
+\label{subsec:edge_chaos}
+\citeauthor{la90} introduces the idea that computation emerges from ``the edge of chaos,'' the critical transition region that separates ordered and chaotic behavior~\cite{la90}. His primary method of investigation is a Monte Carlo sampling of two-dimensional CAs, comparing the relationship between the parameter $\lambda$ and the average dynamical behavior of the system, measured by entropy. From both qualitative and quantitative analyses, the most interesting action in 2D CAs occurs in middling $\lambda$ values, where the \textit{transient lengths} before static structures emerge is arbitrarily long. Low levels of $\lambda$ have short transient lengths before the CA crystallizes (Figure \ref{fig:order_trans}), and high levels of $\lambda$ have short transient lengths before the CA degenerates into chaos (Figure \ref{fig:chaos_trans}). Levels of $\lambda$ in the middle however are a ``sweet spot'' of entropy (Figure \ref{fig:long_trans}); since information storage involves lowering entropy while transmission involves raising entropy, a balance must be struck in the overall system to support these foundations of computation. Mutual information is another measure that captures this same balance: if the correlation of entropy between two given cells is too high, they are overly dependent and have a tendency to crystallize, but if the correlation is too low, the cells are effectively acting independently, indicating chaos. 
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.5\textwidth]{ordered_transient.png}
+\caption[Ordered CA Transient Length]{
+The progression of a one-dimensional $N=4$, $K=5$ cellular automaton with $\lambda=0.15$ from a random initial configuration (time progresses from top to bottom). The transient length is incredibly short, with the automaton converging to a homogeneous state (all white) within four or five time steps. Figure from \citeauthor{la90} \cite{la90}.
+}
+\label{fig:order_trans}
+\end{figure}
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.5\textwidth]{chaos_transient.png}
+\caption[Chaotic CA Transient Length]{
+The progression of a one-dimensional $N=4$, $K=5$ cellular automaton with $\lambda=0.65$ from a random initial configuration. The transient period ends quickly (indicated by the arrow), with dynamic activity degenerating into chaos. Figure from \citeauthor{la90} \cite{la90}.
+}
+\label{fig:chaos_trans}
+\end{figure}
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.20\textwidth]{long_transient.png}
+\caption[Complex CA Transient Length]{
+The progression of a one-dimensional $N=4$, $K=5$ cellular automaton with $\lambda=0.5$ from a random initial configuration. The transient length is quite long (over 10,000 time steps), indicative of more complex dynamical activity. Figure from \citeauthor{la90} \cite{la90}.
+}
+\label{fig:long_trans}
+\end{figure}
+
+Dynamical systems such as CAs exhibit characteristics that echo to the decideability of computation. CAs that live below the transition point quickly crystallize or ``freeze,'' while CAs above the point degenerate into random chaos. The behavior of dynamical systems at the fringes of the $\lambda$ spectrum can thus be determined, while CAs that live near the transition point cannot; this \textit{freezing problem} shows that it is undecideable whether or not a particular CA rule set within this complex region will either crystallize or degenerate due to the long transient lengths. Since computers are simply highly formalized dynamical systems, the classic Halting Problem can be viewed as a specific instance of the freezing problem. Through these experiments and observations on the relationship between $\lambda$ and dynamic, \citeauthor{la90} has established a bound on the complexity of dynamical systems; systems located near the edge of chaos exhibit a wide range of complex behavior that contain the foundations of computation. Thus, there is a narrow location in the $\lambda$ spectrum of dynamical systems where emergent computation can be discovered, with the maximum complexity occurring at $\lambda_c$ (Figure \ref{fig:lambda_trans}).
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.5\textwidth]{lambda_transient_len.png}
+\caption[Lambda and Transient Length]{
+Average transient length as a function of $\lambda$ for a 1D CA. The long transient lengths centered around $\lambda_c=0.5$ indicate the transition between ordered and disordered dynamics. Figure from \citeauthor{la90} \cite{la90}.
+}
+\label{fig:lambda_trans}
+\end{figure}
+
+Further work attempted to pinpoint precisely where the transition point occurs in a class of CA behavior, perhaps continuing along the parallels between CAs and transitions in physical systems. Utilizing mean-field theory, theoretical approximations of the entropy against $\lambda$ in two-dimensional automata made by \citeauthor{wo90} closely match previous experimental results. As the number of total possible cell states approaches $\infty$, it has been determined that there is a sharp phase transition occurring at $\lambda=0.27$, akin to first-order transitions in actual physical systems~\cite{wo90}. Perhaps this is the $\lambda_c$ point for this particular class of CAs. These results show promise in the parallels between physical systems and the dynamic behavior of cellular automata. However, to investigate this in further detail, it may be necessary to identify other statistical properties in order to fully determine the phase transition point.
+
+Likewise, \citeauthor{li90b} examined the dynamics of CA behavior with respect to $\gamma$ in an effort to better characterize the transition region. They determined that this region between ordered and chaotic behavior is not smooth, but rather a complicated structure in of itself as values of $\gamma$ fluctuate widely within the space~\cite{li90b}. Most of the transition region is a boundary between ordered and chaotic, with abrupt jumps in behavior for CAs that cross this border. However, other areas of the region appear to have a ``thickness'' in the boundary, yielding smooth changes in statistical measures through this critical subregion (Figure \ref{fig:ca_space}). Thus \citeauthor{li90b} also come to the conclusion that $\lambda$ alone cannot specify the critical region for dynamic CA systems.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.75\textwidth]{li90b_fig11.png}
+\caption[Hypothesized CA Space]{
+A hypothesized structure of the cellular automata rule space, with the relative location of Wolfram's complexity classes listed. In most areas, the transition between class II and class III automata is sharp. However, some subregions contain a smooth transition at the boundary, where class IV automata are hypothesized to reside in. Figure adapted from \citeauthor{li90b} \cite{li90b}.
+}
+\label{fig:ca_space}
+\end{figure}
+
+Others have questioned whether a precise critical point where computation emerges truly exists. \citeauthor{mi93} reexamine the relationship between $\lambda$ and the dynamic behavior of ordered and unordered CAs by attempting to replicate experiments that suggest the existence of ``critical'' $\lambda_c$ in previous work by \citeauthor{pa88}. Though \citeauthor{wo90} determined that there is a convergence to a critical point in the limit of infinite state CAs, the relationship between $\lambda$ and critical regions is less clear for finite state CAs. What is important to note is that the variability of CAs at a given lambda value could be high (measured by the difference pattern spreading rate, $\gamma$), and so the behavior of a particular rule at a given value of $\lambda$ might be very different from the average behavior at that value. \citeauthor{pa88} utilizes a \textit{genetic algorithm} to evolve one-dimensional, two-state automata ($K=2, N=3$) that solve the majority task; his results indicate clustering around $\lambda_c$ in the final population of CAs, which is cited as evidence for complex behavior emerging at the boundary points. However a theoretical examination shows that, given the natural symmetry in the majority task problem, the optimal $\lambda$ value occurs at $0.5$, not at the critical $\lambda$ point. \citeauthor{mi93} then run their own genetic algorithm, showing that the best CA rules in fact cluster around $0.5$. It is important to note that for that particular class of one-dimensional, two-state automata, $\lambda = 0.5$ is considered to be in the region of ``chaotic'' CAs~\cite{mi93}. 
+
+These results illustrate an important point: statistics that measure the behavior of these CAs may apply an implicit ``filtering bias'' on the class of automata, and so structure may be revealed under different measures that is not present under other measures, as shown by $\lambda$'s classification of the optimal CAs for the majority task as ``chaotic.'' \citeauthor{la90}'s hypothesis that $\lambda$ correlates with computational ability appears to need refinement: $\lambda$ may very well correlated with the average behavior of CAs but what is the significance of  ``average behavior,''  especially when $\gamma$ is high in the critical regions of interest? For a given $N$ and $K$, CAs that have the potential to compute may reside in a wide range of $\lambda$ values, illustrating the need for a more precise metric. \citeauthor{mi93} also stress that the focus should be harnessing the computation ``naturally'' present within a CA rather than attempting to impose traditional definitions of computation upon them. 
+
+Nevertheless, the relationship between critical regions and computation in general remains important and needs to be closely examined at a finer grain. Instead of considering the average behavior of automata, \citeauthor{cr93} decompose and filter the spatial configurations of one-dimensional CAs as they move through time. The central goal of their work is to distill a seemingly ``turbulent'' system by finding a \textit{pattern basis} representation of the CA space that will serve as the backdrop for potential coherent structures present in the system to be identified~\cite{cr93}. These pattern bases form ``regular domains'' that are \textit{temporally invariant}, where the CA rule table maps configurations within a regular domain to the same regular domain~\cite{mi96}. With these stable domains identified, they can be filtered out of the space-time diagrams, with the dynamics of interest becoming apparent at the boundaries between regular domains, which are particle-like in behavior~\cite{cr93}. Thus, the dynamics of a CA can be examined in this manner to illuminate underlying structure, providing more useful and finer-grained information than simply classifying the system as ordered or chaotic as shown in Figure \ref{fig:ca_filter}. \citeauthor{cr93} calls these domains and structures the ``intrinsic computation'' of the CA, as they can be understood in computational terms regardless of the global computation taking place in the CA~\cite{mi96}. The intrinsic computation in itself is an interesting unit of analysis, capable of generating rich interactions at the domain borders that may in fact cause coordinated behavior to emerge~\cite{cr95}. Again, this stresses the importance of information granularity, as the presence of many smaller regular domains that have inherently different structures in the CA space can cause statistics collected across the global domain to be misleading~\cite{cr93}.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.9\textwidth]{cr93_fig3.png}
+\caption[Filtered CA Behavior]{
+Space-time plots for a $K=5$, $N=2$ 1D cellular automata with a random initial configuration of lattice size 100. The left image illustrates the unfiltered progression of the CA, while the right image illustrates the same behavior, filtered by two regular domains indicated by white and gray. Figure adapted from \citeauthor{cr93}~\cite{cr93}.
+}
+\label{fig:ca_filter}
+\end{figure}
+
+
+Throughout our exploration of computation in distributed dynamic systems, we often see a delicate balance struck between order and chaos in order to support complex behavior: information must be both propagated (high entropy) and stored (low entropy), and minute alterations in local configurations can have catalytic global effects. What happens when this balance is disturbed? Thus far we have only considered highly regular environments for computation in CA systems, with uniform lattice grids and rule tables. Do these systems behave robustly when the environments are not well-structured? Dynamic natural systems serve as ``the ultimate proof of concept,'' as they are able to function despite residing in environments (the real world) that are inherently noisy and irregular~\cite{si99}. We'll look first to inspiration from nature when considering fault tolerance in computing CA systems. 
+
+% TODO more on sandpile analogy
+
+% TODO elaborate on regular domains in the metrics section?
+
+\section{Robustness in Face of Irregularity}
+\label{sec:Robust}
+
+\subsection{Stomatal Dynamics Revisited: Utilizing Environmental Noise}
+We begin our review of robustness by revisiting plant stomatal dynamics. Unlike technological systems, biological systems such as stomatal arrays on plant leaves are often able to manage variable environments ``innately,'' without external intervention or control. Indeed, though stomatal systems behave similarly to majority task CAs as noted earlier in Section \ref{subsec:Stoma}, they face a number of irregularities not accounted for in the CA models such as \textit{heterogeneous interactions}, where local interactions may not be uniform due to stomatal size, orientation, and spacing,  or \textit{modularity}, where leaf veins cause stomata to be subdivided into modules that interact at a level beyond individual stoma interaction~\cite{me07}. Additionally, the stomatal systems must handle temporal \textit{state noise}, where there is unavoidable variability and imprecision in the stomatal functioning itself across time. Thus, \citeauthor{me07} examine the behavior and performance of stomatal-inspired majority task CAs in environments designed to mimic the irregularities plant stomata have to contend with.
+
+When considering the majority task, most initial configurations are relatively easy for CAs to classify correctly, where there are a large proportion of either ``on'' or ``off'' cells present in the space. Unsurprisingly, the most difficult cases are when the density of on and off cells are roughly equivalent. \citeauthor{me07} note that these hard cases often cause patchiness and are solved correctly only when the patches travel coherently across the CA space, emphasizing the importance of information transfer when supporting task performance in these locally connected networks. Unsuccessful CAs often have ``stuck'' patches that are unable to be resolved. Irregularities in the form of heterogeneous interactions, simulated by nonuniform rule tables and random connectivity, and modularity, simulated by grafting together ``mosaic'' networks of modules, both reduce the performance of the task CAs but do not cripple them~\cite{me07}. Perhaps most surprisingly, the majority task CAs actually \textit{improve} in performance when small amounts of state noise are introduced to the system while other defects are present. \citeauthor{me07} hypothesize that this is because the state noise cause small perturbations in the system, stimulating movement and perhaps freeing previously stuck patches to move about the space once more. We have seen how small changes can snowball and sweep through entire the entire CA space, and it appears that natural systems embrace noise and use it to their advantage. Indeed, randomness appears essential in facilitating the self-sustaining and self-informing function of decentralized biological systems~\cite{mi05}. We will turn to \citeauthor{mi05}'s analysis of how these systems might operate to illustrate how such structures can maintain themselves in such complex environments despite the lack of central control.
+
+%TODO Table 1 of me07 for noise improvement
+
+\subsection{Redundancy in Decentralized Systems}
+\citeauthor{mi05} presents two instances of decentralized systems, the human immune system and ant colonies, which perform complex tasks via ``adaptive self-awareness:'' global information about the system dynamically shapes and feeds back to the movements and actions of the lower level components. What is interesting about these systems is that single agents act naively, tending to conform to what the dominant behavior is locally: for example, an ant in an ant colony will have an increased probability of switching to and working on a task if it observes many other ants in its immediate environment working on it~\cite{mi05}. However, it is the probabilistic aspect of these decisions, the idea of sampling a small ``neighborhood,'' that allow the complex behavior to emerge. Similar to an ant's local sampling, a lymphocyte will bond with molecules indicative of pathogens it encounters locally and will reproduce proportional to the strength of the bond it forms, facilitating a Darwinian process in that the best lymphocytes for combating the pathogen will emerge on a system-wide scale.
+
+From studying immune systems and ant colonies, \citeauthor{mi05} emphasizes the need for randomness and probabilistic decisions in order for controlled behavior to occur: these systems are not just robust to variations in their environment, but actually require irregularities and noise to function properly. Additionally, they illustrate the importance of redundancy and sampling. A single lymphocyte or ant is a fragile unit, and so the global system cannot be dependent on any specific agent present within its system. Instead, there is an inherent redundancy within the system, with many agents sampling their local environments, yielding independent, fine-grained behavior that only become significant when considered globally~\cite{mi05}. Thus, the individual components do not rely on each other making the system robust to faults, yet the overall behavior is highly coordinated. 
+
+We see the ideas of redundancy and random noise come into play again in \citeauthor{ac14}'s efforts to mimic natural robustness to variability in their \textit{Moveable Feast Machine,} a dynamic CA-based architecture designed with the hope of producing ``indefinitely scalable,'' robust computing. The computational entities, called \textit{atoms}, move about probabilistically in a two dimensional grid, independently and asynchronously acting on their local neighborhood. A sorting routine implemented within this architecture, \textit{demon horde sort}, utilizes ``hoarder'' atoms that sort values spatially: the hoarders move about randomly in space, pushing locally higher values above itself, and locally lower values below itself~\cite{ac12}. Like the lymphocytes and ants, the hoarders act individually, only producing the desired end result of a sorted list when considered on a global scale. Since the behavior of each hoarder is essentially the same, a space filled with many hoarder atoms will contain a large amount of functional redundancy that allow the system to tolerate many environmental perturbations, such as the destruction of hoarder atoms~\cite{ac14}. This can be thought of as a robust parallelized bubble sort in a sense, reaping the performance benefits of non-sequential computation while also being robust to faults~\cite{ac13,ch89}. \citeauthor{ac14}'s system is facilitated by the same concepts \citeauthor{mi05} identified in her work: decentralized systems harness the power of noise and redundancy to self-organize and perform complex tasks.
+
+However, we feel that there is another potential source of variability that has not been considered as extensively in the work presented above: spatial irregularity. Both \citeauthor{me07} and \citeauthor{ac14} draw inspiration from biological systems yet continue to utilize uniform grids as their spatial representations. Natural dynamical systems do not typically operate in a uniform lattice, so this may be a limiting assumption. Thus, we will present previous work considering spatial representations and how they may potentially impact the dynamics of the distributed CA systems we have been examining.
+
+%TODO Chandy reference, UNITY programming language, ch89
+%TODO si04, Studying Fault Tolerance
+
+\section{Spatial Representations and Modeling of CAs}
+\label{sec:Model}
+\subsection{Limitations of Traditional CA Spatial Representations}
+
+Returning to the applied CA models from section \ref{sec:Motiv}, there are some who question the viability of traditional CA models as adequate simulations of real-world phenomenon. Beyond the obvious limitation that real-world systems rarely exist in regular grids, a primary concern is that the grid predefines a fixed spatial scale, making representations of both cells and the environment itself inflexible~\cite{he98}. In the case of modeling population dynamics, if the cell size is on the scale of the agent we are modeling, building and simulating on a grid that is adequately sized for modeling the movement of the agent often becomes intractable~\cite{bi07}. On the other hand, if the cell size is larger than the agents being modeled, the structure of the grid has placed an arbitrary bound on the population density it can represent.
+
+Additionally, the neighborhood definitions are entirely dependent on the structure of the grid configuration, making it difficult to define alternative neighborhood stencils beyond variations of the standard Moore or Von Neumann neighborhoods. The local connectivity can be varied by using different shapes such as hexagons as tiles, but the number of neighbors per cells are still restricted to the same amount across the space. Thus, in order to support richer neighborhood interactions, the size of the neighborhood must be variable while still respecting the local connectivity of the grid. We consider a first step in this direction by examining alternative formulations of the Game of Life.
+
+% TODO more here
+
+\subsection{Spatial Variation of Conway's Game of Life}
+
+The Game of Life, discovered by John Conway, is a $K=2$, $N=9$ two-dimensional cellular automaton that is particularly remarkable because of both the rich emergent structures it can generate as well as its Turing universality~\cite{ga70}. Most instances of the Game of Life are played on regular, two dimensional lattices; what changes in behavior occur when it is simulated on an aperiodic \textit{Penrose tiling}? \citeauthor{hi05} examined this variation, and in particular ran experiments that explored the \textit{lifetimes} (number of generations until stabilization) as well as  \textit{ash densities} (the fraction of ``on'' cells in a stabilized configuration) of random initial configurations. The Game of Life on the Penrose tiles have lifetimes that are much shorter and ash accumulation half as dense as games played on the regular lattice~\cite{hi05}; this is likely due to the irregularity in the tiling distribution, illustrating that at least in this instance, the variable neighborhood sizes across the grid make it more difficult to maintain coherent structures. It should be noted however that \citeauthor{hi05} directly translated the rules of the Game of Life onto the Penrose tiling without any modification, which may not be appropriate since a given cell may have either eight or nine neighbors as opposed to the constant eight neighbors in traditional Life instances. An alternative rule set would be to define the ``living'' criteria based on a ratio or percentage of live cells in the surrounding area, as it would produce appropriately dynamic behavior that aligns with the variability in the tilings. This addition is an extension on these initial experiments that may be more revealing to the overall relationship between the Game of Life played on a grid and more irregular environments like Penrose tiles. 
+
+To take spatial representations to one extreme, the concept of a grid can be removed altogether. \textit{SmoothLife} is the result, where instead of cells on a grid individual points within the Cartesian space is considered and transition rules are defined for a point's circular neighborhood~\cite{ra11}. In SmoothLife's spatial representation, Euclidean distance is respected in regard to neighborhood definitions resulting in a true spatial representation of connectivity. Unfortunately, SmoothLife represents too radical a shift away from the discrete dynamic systems we have been considering with the lack of spatial structure entirely. Ideally, spatial representations of Euclidean distance and resulting neighborhood connections should be preserved while still maintaining a discrete structure. Voronoi diagrams possess these exactly traits, and so we will consider Voronoi-based CA systems next.
+
+%TODO elaboration
+
+\subsection{Voronoi Representations of CA}
+
+First, we review the basic idea of Voronoi diagrams. In order to construct a diagram, a set of \textit{generator points} are placed in the plane. The cell defined by a generator point $i$ is defined as the area containing all points of the plane that are closer to $i$ than any other point with regards to Euclidean distance (Figure \ref{fig:voronoi})~\cite{ok09}. In the realm of Geographic Information Systems, Voronoi CA systems have been utilized to explore irregular spatial patterns that occur in the real world~\cite{ca06,sh00}. \citeauthor{sh00} suggest that the main barrier that prevents CAs from being applied in the real world is that CAs cannot provide a way to handle irregular, spatially defined neighborhood relations; Voronoi-based CAs appear to be a solution to this fundamental problem. Furthermore, due to their nice spatial properties, Voronoi diagrams are often utilized in models of various natural structures, such as cells~\cite{ok09}. Though there has been extensive work examining computation in regular dynamical systems (Section \ref{sec:Crit}) and numerous applications of CAs both applied to and derived from nature (Section \ref{sec:Motiv}), there has been little work done analyzing how biologically plausible spatial representations such as Voronoi diagrams can impact computation and dynamics within a CA system. \citeauthor{fl01} provide one such analysis in the context of modeling social dynamics.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.5\textwidth]{wh03_fig1_voronoi}
+\caption[Voronoi Diagram]{
+	A voronoi diagram with its corresponding generator points. Figure adapted from \citeauthor{wh03}~\cite{wh03}.
+}
+\label{fig:voronoi}
+\end{figure}
+
+\citeauthor{fl01} simulate several social dynamics interactions through CA systems ran on both regular grids and Voronoi diagram analogs. The same global behavior was preserved in the Voronoi cases, though the dynamics took a longer time to converge to stabilized behavior relative to the regular grid case~\cite{fl01}. Though only a specific class of computational tasks were tested, the conclusion that these social dynamics tasks are robust to variation in grid structure leads us to the beginning stages of establishing some form of equivalence between classes of irregular and regular grid structures. Additionally, examining the spatial behavior of cells in the Voronoi case revealed some interesting patterns. Because of variations in the local structuring within the Voronoi diagrams, some areas of the irregular grid never participate in computation even when completely surrounded by computing cells, resisting all outside influences (Dead cells figure)~\cite{fl01}. This ``dead cell'' phenomenon provides evidence that the spatial properties inherent in Voronoi diagrams can impact the system's dynamics beyond variations in cell neighborhood connectivity.
+Additionally, the potential presence of dead cells along with the randomness produced by generating grids through generator points make Voronoi diagrams an interesting way of introducing variability to a cellular automata as it implicitly encodes some irregular features we have explored in Section \ref{sec:Robust}. However, further work is needed to thoroughly investigate the impact of different spatial representations on the complex behavior and computation in dynamic, decentralized systems. 
+%Thus, one of the main goals of this work is apply the rigorous analysis previously seen (Section \ref{sec:Crit}) concerning emergent computation on spatially diverse systems such as Voronoi-based automata in pursuit of illuminating how natural systems can compute within such noisy environments.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.75\textwidth]{fl01_fig9_color.jpg}
+\caption[``Dead Cells'' in Voronoi CA]{
+An irregular cellular automaton modeling cooperation dynamics in its stable state. Cooperating cells are blue and non-cooperating cells are red. Though the expected end state in this simulation on a regular grid would be a homogeneous cluster of cooperation, there are cells completely surrounded by cooperating neighbors that resist participating in the computation. Figure from \citeauthor{fl01}~\cite{fl01}.
+}
+\label{fig:dead_cells}
+\end{figure}
+
+\section{Summary}
+\label{sec:PrevSum} 
+
+We have seen throughout this review that work on the computational dynamics of distributed natural systems is a two-way street, 
+%TODO right phrasing?
+with researchers both utilizing cellular automata to investigate complex behavior in natural systems as well as drawing inspiration from nature to build more robust and efficient ``cellular computers.'' Additionally, there has been extensive work concerning how dynamic systems can give rise to computation with an abundance of metrics that can be used to analyze such systems. It would be reasonable to apply the measures from these computational criticality studies to attempt to understand natural systems. Unfortunately, there is not a clear ``mapping'' between the foundational structures of cellular automata and dynamical natural systems. Assumptions cannot be made about a potential correspondence between local connections, transition rules, or spatial orientation when CAs and natural systems operate within such contrary environments: the control and precision of computer simulation versus the noise and inconsistency of the real world. For example, the spatial structure of cellular automata is limiting when utilizing them as a model (Section \ref{sec:Model}), which is why researchers in specific modeling domains have explored removing the lattice regularity of CAs in order to observe the impact that structural assumption has on the dynamic behavior of the system.
+
+%TODO "fuzziness"?
+There is inherent imprecision when dealing with natural systems, which makes utilizing the criticality statistics problematic. The definitions of metrics like $\lambda$ and $\gamma$ as well as the notion of average dynamic behavior can be difficult translate to systems where there are no structural uniformities that can serve as a foundation for measurement. We have to adapt these metrics to the domain of irregular cellular automata in order to properly investigate the nature of computation in such systems. Perhaps there is some sort of functional equivalence between regular and irregular CAs, or perhaps they are separate classes of dynamical systems. Thus, this work will take some first steps towards resolving the complexion of this relationship. Our goal is to examine and identify potentially fundamental differences or equivalences between irregular and traditional cellular automata in the pursuit of understanding how natural decentralized systems can compute ``in the wild.''
+
+%TODO: is hashlife ``exploiting regularities'' example appropriate in the summary?
+
+%TODO: are ``supplemental'' figures necessary (ie neighborhood stencils, general voronoi diagram?)
+
+
+% How much of Voronoi work goes in the previous work section, how much goes in later parts of the thesis?
+
+% TODO Ga70
+
+\processdelayedfloats
+
+\begin{appendices}
+
+\chapter{Definitions of Criticality Metrics}
+\label{app:Defs}
+\numberwithin{equation}{section}
+
+\section{Lambda}
+\label{appA:lambda}
+(From \citeauthor{la90}~\cite{la90}) Given a cellular automata with cell states $\Sigma$ ($K = |\Sigma|$) and $N$ neighbors, pick an arbitrary state $s \in \Sigma$ and call it the \textit{quiescent} state $s_q$. Let $n$ be the number of transitions some transition function $\Delta$ maps to $s_q$. Pick the remaining $K^N - n$ transitions to be distributed uniformly over the other $K-1$ states. Then $\lambda$ is:
+\begin{equation}
+\lambda = \frac{K^N - n}{K^N} 
+\end{equation}
+
+
+\section{Gamma}
+\label{appA:gamma}
+(From \citeauthor{li90b}~\cite{li90b}) First, we define the \textit{left-moving difference rate} for one-dimensional CA by taking a configuration $a = \{...a_{-1}, a_0, a_1...\}$ and constructing another configuration $a' = \{...a'_{-1}, a'_0, a'_1...\}$ with $a_i = a'_i$ for $i < 0$, $a_i \ne a'_i$ for $i=0$ and $a'_i$ randomly chosen for $i > 0$. The \textit{difference pattern} at time step $t$ for a given cell $i$ is defined as $\delta_i^t = 0$ if $a_i^t=a_i^{'t}$ and $\delta_i^t = 1$ otherwise. The \textit{left front} of the difference pattern is $i_{left}^t = \min\{i | \delta_i^t = 1\}$. Thus the left-moving difference rate $\gamma_{left}$ is:
+
+\begin{equation}
+\gamma_{left}(a) = \lim_{t, \tau \to \infty, t/\tau \to 0} = \frac{i_{left}^\tau - i_{left}^{\tau + t}}{t - \tau}
+\end{equation}
+
+Similarly, the \textit{right-moving difference rate} is defined with $a_i = a'_i$ for $i > 0$, $a_i \ne a'_i$ for $i=0$ and $a'_i$ randomly chosen for $i < 0$. The \textit{right front} is $i_{right} = \max\{i | \delta_i^t = 1\}$. Then $\gamma_{right}$ is:
+
+\begin{equation}
+\gamma_{right}(a) = \lim_{t, \tau \to \infty, t/\tau \to 0} = \frac{i_{right}^{\tau + t} - i_{right}^{\tau}}{t - \tau}
+\end{equation}
+
+The overall difference spreading rate $\gamma$ is then:
+
+\begin{equation}
+\gamma(a) = \gamma_{left}(a) + \gamma_{right}(a)
+\end{equation}
+
+
+\section{Shannon Entropy}
+\label{appA:entrop}
+(From \citeauthor{li90b}~\cite{li90b}) Given some discrete probability distribution $\{p_i\}$, the \textit{Shannon entropy} $H$ is defined as:
+
+\begin{equation}
+H = \sum_i p_i \log(p_i)
+\end{equation}
+
+The \textit{single cell spatial entropy} is calculated by defining a probability distribution counting the frequency of occurrence of all states in $\Sigma$ for a set amount of time steps. Let $\{c_i\}$ for $i = 1...K$ be the set of all counts, where $c_i$ is the number of times state $i \in \Sigma$ occurs. Then the probability distribution is:
+
+\begin{equation}
+\{p_i\} = \left\{\frac{c_i}{\sum_j c_j}\right\}
+\end{equation}
+
+\section{Mutual Information}
+\label{appA:mut_info}
+(From \citeauthor{li90b}~\cite{li90b}) Given two probability distributions $\{p_i\}$ and $\{p_j\}$ as well as their joint distribution $\{p_{ij}\}$, we define the \textit{mutual information} $M$ as:
+
+\begin{equation}
+M = \sum_i \sum_j p_{ij} \log\frac{p_{ij}}{p_i p_j}
+\end{equation}
+
+We can apply mutual information to spatial-temporal patterns by defining the two probability distributions as the frequency of having a particular cell state on two sites separated by some distance $d$. The mutual information between two sites of any spatial-temporal distance can be computed.
+
+\section{Mean Field Theory Estimates}
+\label{appA:MFT}
+(From \citeauthor{li90b}~\cite{li90b}) Given a 1D cellular automata with $K=2$ and $N = 2r+1$, we can obtain some estimates of both $\lambda_c$ and $\gamma$. $\lambda_c$ can be estimated by:
+
+\begin{equation}
+\lambda_c = \frac{1}{2} - \frac{1}{2}\sqrt{1 - \frac{2}{r+1}}
+\end{equation}
+
+In order to estimate $\gamma$, first calculate $\lambda$ using the cellular automata's transition rules $\Delta$. Then:
+
+\begin{equation}
+\gamma = \frac{(2r+2)\lambda - (2r + 2)\lambda^2 - 1}{\lambda(1-\lambda)}
+\end{equation}
+
+\pagebreak
+
+\citeauthor{wo90} utilize mean-field theory to estimate the entropy $H$ of a 2D cellular automata with $K=8$ and $N=5$~\cite{wo90}. Let $v$ be the density of the quiescent state $s_q$ in the spatial configuration, so $v=1$ would indicate a configuration of all $s_q$. Then, assuming that the other seven states appear equally often in the transition rules $\Delta$, we can estimate $H$:
+
+\begin{equation}
+H = -\left[ v \log v + 7\left(\frac{1-v}{7}\right)\log\left(\frac{1-v}{7}\right)\right]
+\end{equation}
+
+\end{appendices}
+
+\bibliographystyle{plainnat}
+\bibliography{../Liu_References}
+\end{document}
