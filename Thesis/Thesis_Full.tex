@@ -344,6 +344,9 @@ In this chapter, we will give an overview of the collection of tools we have bui
 
 Our CA simulation platform follows an event-driven architecture written in C++; actions are placed on a queue and are performed one at a time. The event queue structure allows us to easily interleave actions in between time steps of a CA simulation; for example, we can take snapshots of the grid state or dump measurements to file in between time steps at any frequency we wish.
 
+%TODO move around?
+We designed this system primarily with flexibility in mind. Modular components and data structures can easily be swapped in and out of the simulation platform, giving us fine-grained control over the experiments we are running. Performance is not a major concern, so long as simulations and experiments can complete within a reasonable amount of time: for reference an experiment that runs 1,000 simulations 500 time steps each, writing data to disk at every time step for all simulations takes a few hours in total to complete.
+
 Termination of the CA simulation occurs either when a maximum time step is reached, or when a grid state is repeated. We track grid states by walking through all cells on a grid in a consistent order, appending each cell state to a string array and then passing the resulting string through a hash function. We keep a history of these hashes along with the time step they occur, and terminate the simulation if a hash is ever repeated. Recording the time step also allows us to track the periodicity of any potential oscillating structures occurring within the simulation.
 
 We execute rule table updates across the grid in a ``spreading activation'' fashion in order to increase the performance of the simulator. Instead of visiting and updating each cell, we track which cells changed state in the previous time step and place those cells along with their neighbors in a ``change'' list. When updating the graph for the next time step, we only apply the transition rule to cells in the list. We then repeat this process, updating the list with any cells and their neighbors that have changed state. We initialize the change list at the beginning of the simulation to all cells in the grid. This method of applying updates allows us to only consider cells that could potentially change, saving time throughout the CA simulation, especially if the grid is large. 
@@ -377,7 +380,56 @@ Measured statistics are exported to .csv files and analyzed using Python with pa
 We'll describe the algorithms utilized to generate the various grids we run CA simulations on.
 
 \subsection{Penrose Tilings}
-TODO
+
+/*
+ * This program generates images of penrose tilings and penrose-connected
+ * graphs.  Its main use is with Tony Liu's software to perform CA simulations
+ * on general graphs.
+ *
+ * The approach used here is to recursively generate patches of a tiling
+ * through inflation processes.  It supports kite/dart and thin/thick rhomb
+ * tilings by modeling Rapheal Robinson's recursive decomposition.  However,
+ * instead of drawing triangles, this program draws the full associated tile.
+ * Thus many tiles encountered in the decomposition have the potential to
+ * be drawn multiple times.  To avoid this, we ``'register'' faces as they're
+ * encountered, keeping only one copy of each encountered.
+ *
+ * Points that are mentioned during this process are stored in a point list.
+ * The index of the point in this list is used, then, as a shorthand for
+ * that location.  Faces are collections of four point indices, with the
+ * smallest index first, and the smallest neighbor second.  For some
+ * purposes (notably for the generation of Liu-style graphs), it is helpful
+ * to have a notion of edges.  When necessary, edges are constructed as pairs
+ * of point indices with the smaller index first.
+ *
+ * All objects are placed in a coordinate space whose unit size is 1/72",
+ * a PostScript point.  This is arbitrary, but makes the generation of
+ * PostScript output easier.  To support affine transformations, a small
+ * transformation system is provided that allows translation, rotation, and
+ * scaling of 2D coordinate systems.  It is compactly stored and models, loosely
+ * the approach used by PostScript.  For example, the transformation matrix
+ * is stored as a 3x2 matrix since the last column can be fixed.  When
+ * necessary, the current graphics transform (currentMatrix) can be pushed
+ * on a graphics context stack with gsave and later restored with grestore.
+ * This allows routines to save and reset the graphics transformation system
+ * for use in scaling, rotatating, and translating the final image in a
+ * PostScript output (which centers the image in the center of a page) or
+ * for supporting rescaling for use within a fixed coordinate viewport centered
+ * around the origin.
+ *
+ * Registerface may fail to register the face (and thus not include it in
+ * the final output) if all of the points are more distant than `radius' away.
+ *
+ * All searches of lists are linear, and in many cases the searches are
+ * obviously inefficient and could be improved with additional data structures.
+ *
+ * There is heavy use of dynamic memory allocation with little concern about
+ * freeing or collecting garbage.  Obviously, this could be improved.
+ *
+ * This software is free and distributed as-is, and is not suitable for any
+ * particular purpose.
+ */
+
 
 \subsection{Delaunay Triangulations and Voronoi Diagrams}
 The goal with building grids using Voronoi diagrams is to produce irregular grids that still respect Euclidean distance, as discussed in Section \ref{subsec:ModelVoronoiRep}. Given a set of \textit{generator points} $\{p_1, ..., p_n\}$ in the plane, a Voronoi polygon $V_k$ corresponding to a generator point $p_k$ consists of all points whose distance to $p_k$ is less than its distance to any other generator point. Thus, we can partition the plane into Voronoi polygons that correspond to every generator point, producing a \textit{Voronoi Diagram}. These polygons will serve as the cells in our CA simulations. 
@@ -421,8 +473,8 @@ Experiments and simulations involving $\lambda$ require static neighborhood size
 \end{figure}
 
 
-%\section{Stencil and Table Generation}
-%\label{sec:StencilGen}
+\section{Stencil and Table Generation}
+\label{sec:StencilGen}
 
 \processdelayedfloats
 
