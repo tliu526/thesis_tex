@@ -1,7 +1,6 @@
 \documentclass[a4paper,11pt]{report}
 \usepackage{amsmath,amsfonts,amsthm,amssymb,amscd}
 \usepackage[top=1in, bottom=1in, left=1in, right=1in] {geometry}
-%\usepackage{fixltx2e}
 \usepackage[numbers]{natbib}
 \usepackage{enumitem}
 \usepackage{setspace}
@@ -21,7 +20,6 @@
 %endfloat
 \usepackage[nomarkers,nofiglist,fighead]{endfloat}
 \renewcommand{\efloatseparator}{\mbox{}}
-
 
 \onehalfspacing
 
@@ -453,14 +451,14 @@ Given a Delaunay Triangulation, we can produce its corresponding Voronoi Diagram
 \centering
 \includegraphics[width=0.4\textwidth]{voronoi_generation}
 \caption[Voronoi Diagram Generation]{
-	The Voronoi Diagram construction process. We begin with a random set of points (left), compute the Delaunay Triangulation (center), and subsequently the Voronoi Diagram (right).
+	The Voronoi Diagram construction process. We begin with a random set of points (top), compute the Delaunay Triangulation (center), and subsequently the Voronoi Diagram (bottom).
 
 }
 \label{fig:voronoi_gen}
 \end{figure}
 \subsection{Voronoi Quadrilaterals}
-
-Experiments and simulations involving $\lambda$ require static neighborhood sizes across all cells in the grid. One way we address this requirement is by generating irregular grids that have cells of the same number of sides. Specifically, given a Voronoi Diagram we can further partition the region such that all cells in the plane are quadrilaterals. This conversion is accomplished by taking two edge-adjacent polygons and forming a quad from the two generator points and the end points of the shared common edge between the polygons (Figure \ref{fig:vquad_gen})~\cite{am10}.
+\label{subsec:vquad}
+Experiments and simulations involving $\lambda$ require static neighborhood sizes across all cells in the grid. One way we address this requirement is by generating irregular grids that have cells of the same number of sides. Specifically, given a Voronoi Diagram we can further partition the region such that all cells in the plane are quadrilaterals. This conversion is accomplished by taking two edge-adjacent Voronoi polygons and forming a quad from the two generator points and the end points of the shared common edge between the polygons (Figure \ref{fig:vquad_gen})~\cite{am10}. As long as the given Voronoi Diagram is ``well-formed,'' specifically with generator points placed a minimum radius from each other, this quadrilateral generation is possible across an entire Voronoi diagram, as seen in Figure \ref{fig:vquad_grid}. Note that though cells in the resulting \textit{VQuad} grid always share edges with four other neighboring cells (excluding the boundary) resulting in uniform generalized von Neumman neighborhood sizes across the grid, the number of cells they share vertices with are variable. This variability in vertex adjacency is partially due to the presence of concave quadrilaterals in the resulting grid. %TODO tessellation right here?
 
 \begin{figure}[htp]
 \centering
@@ -471,9 +469,39 @@ Experiments and simulations involving $\lambda$ require static neighborhood size
 \label{fig:vquad_gen}
 \end{figure}
 
+\begin{figure}[htp]
+\centering
+%TODO add vquad grid
+%\includegraphics[width=0.5\textwidth]{vquad_generation}
+\caption[Voronoi Quad Grid]{
+  A representative Voronoi Quad grid, generated from the same set of generator points as Figure 
+  \ref{fig:voronoi_gen}.
+}
+\label{fig:vquad_grid}
+\end{figure}
+
+
 \subsection{Grid Degeneration}
-In Chapter TODO
-\section{Stencil and Table Generation}
+In Chapter \ref{ch:lambda_degen}, we consider various degenerated Voronoi Quad grids
+in our examination of the $\lambda$ parameter. We will discuss the methods for generating 
+these degraded grids here.
+
+\subsubsection{Generator Point Removal}
+As noted in Section \ref{subsec:vquad}, VQuad grid generation is dependent on the position of Voronoi generator points in the input Voronoi diagram. Thus, one manner of grid degeneration is simply to remove generator points from the input diagram. Since a generator point in the input diagram could be a vertex to many VQuad cells, generator point removal has the effect of taking out large chunks of the VQuad grid, as pictured in \ref{fig:genpt_degen}.
+
+\begin{figure}
+\centering
+%TODO add genpt_degen figure
+%\includegraphics[width=0.5\textwidth]{vquad_generation}
+\caption[Generator Point Degradation]{
+  A VQuad grid degraded by the removal of input generator points. Notice the lack of small ``holes'' in the resulting grid.
+}
+\label{fig:genpt_degen}
+\end{figure}
+
+\subsubsection{Crosshatching Degeneration}
+
+\section{Stencil and Table Implementation}
 \label{sec:StencilGen}
 
 \processdelayedfloats
