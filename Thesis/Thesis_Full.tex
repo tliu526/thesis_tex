@@ -4,6 +4,8 @@
 \usepackage[numbers]{natbib}
 \usepackage{enumitem}
 \usepackage{setspace}
+\usepackage{courier}
+
 %\usepackage{todonotes}
 
 \usepackage[titletoc, title]{appendix}
@@ -343,9 +345,11 @@ Our CA simulation platform follows an event-driven architecture written in C++; 
 %TODO move around?
 We designed this system primarily with flexibility in mind. Modular components and data structures can easily be swapped in and out of the simulation platform, giving us fine-grained control over the experiments we are running. Performance is not a major concern, so long as simulations and experiments can complete within a reasonable amount of time: for reference an experiment that runs 1,000 simulations 500 time steps each, writing data to disk at every time step for all simulations takes a few hours in total to complete.
 
+
+
 Termination of the CA simulation occurs either when a maximum time step is reached, or when a grid state is repeated. We track grid states by walking through all cells on a grid in a consistent order, appending each cell state to a string array and then passing the resulting string through a hash function. We keep a history of these hashes along with the time step they occur, and terminate the simulation if a hash is ever repeated. Recording the time step also allows us to track the periodicity of any potential oscillating structures occurring within the simulation.
 
-We execute rule table updates across the grid in a ``spreading activation'' fashion in order to increase the performance of the simulator. Instead of visiting and updating each cell, we track which cells changed state in the previous time step and place those cells along with their neighbors in a ``change'' list. When updating the graph for the next time step, we only apply the transition rule to cells in the list. We then repeat this process, updating the list with any cells and their neighbors that have changed state. We initialize the change list at the beginning of the simulation to all cells in the grid. This method of applying updates allows us to only consider cells that could potentially change, saving time throughout the CA simulation, especially if the grid is large. 
+We execute rule table updates across the grid in a ``spreading activation'' fashion in order to increase the performance of the simulator. Instead of visiting and updating each cell, we track which cells changed state in the previous time step and place those cells along with their neighbors in a ``change'' list. When updating the graph for the next time step, we only apply the transition rule to cells in the list. We then repeat this process, updating the list with any cells and their neighbors that have changed state. We initialize the change list at the beginning of the simulation to all cells in the grid. This method of applying updates allows us to only consider cells that could potentially change, saving time throughout the CA simulation especially if the grid is large. 
 
 \subsection{Structures}
 Our CA simulation platform consists of a collection of data structures that are utilized in tandem to run the simulation. The most essential structures are briefly described below.
@@ -374,18 +378,20 @@ Grids will be explored in more detail in Section \ref{sec:GridGen}, while Stenci
 \label{fig:sys_arch}
 \end{figure}
 
-\subsection{Input/Output Files and Data Analysis}
+\subsection{Input/Output Files and Running Our System}
 
-We have a standardized format for storing and reading in grid configurations, which allows us to easily stop and restore CA simulations as well as save and transfer them across different machines. A representative input grid file can be found in Appendix TODO. The visual representation of our grids are built by creating graph descriptions (.dot file extension) for \textbf{neato}, a graph layout program part of the Graphviz drawing package~\cite{el01}. Images of our neato grid representations can be found in Section \ref{sec:GridGen}.
+We have a standardized format for storing and reading in grid configurations, which allows us to easily stop and restore CA simulations as well as save and transfer them across different machines. A representative input grid file can be found in Appendix \ref{appB:grid_in}. The visual representation of our grids are built by creating graph descriptions (.dot file extension) for \textbf{neato}, a graph layout program part of the Graphviz drawing package~\cite{el01}. Images of our neato grid representations can be found in Section \ref{sec:GridGen}. Measured statistics are exported to .csv files and analyzed using Python with packages from the SciPy ecosystem~\cite{jo14}.
 
-Measured statistics are exported to .csv files and analyzed using Python with packages from the SciPy ecosystem~\cite{jo14}.
+We utilize the GNU package \texttt{getopt} to pass Unix-style command line arguments to our system, making batching experiments to be run across multiple machines 
 
+A CA simulation begins by reading in an input grid file, initializing all 
 \section{Grid Generation}
 \label{sec:GridGen}
 
 In this section we'll describe the algorithms utilized to generate the various grids we run CA simulations on.
 
 \subsection{Penrose Tilings}
+To generate Penrose Tilings and Penrose-connected graphs, we utilize inflation processes to recursively generate the tiling. We utilize \citeauthor{ro71}'s triangle recursive decomposition to draw both kite/dart and thin/thick rhomb tilings, except full tiles are drawn instead of individual triangles~\cite{ro71}. Though drawing full tiles will likely result in tiles being considered and drawn multiple times, we avoid this by marking faces as they are drawn, only keeping a single copy of each face. As in all our grid generation programs, we track geometric primitives (\texttt{Point}, \texttt{Edge}, \texttt{Face}) to make generating our standard grid input file straightforward.
 
 /*
  * This program generates images of penrose tilings and penrose-connected
@@ -524,7 +530,7 @@ We would like to maintain a notion of both von Neumman and Moore neighborhoods e
 \subsection{$\lambda$ Rule Tables}
 %wolfram command is: rotations with 4 beads, 8 colors
 %TODO Burnside's lemma?
-In the $\lambda$ experiments performed by \citeauthor{wo90}, rule tables must be \textit{isotropic} in that all planar rotations of a particular neighborhood configuration map to the same output cell state; this condition removes the global property of spatial orientation from influencing rule transitions~\cite{av00,wo90}. As a result, what would be a $K^N$ sized table results in a smaller table because only rotationally distinct neighborhood configurations are unique entries: specifically, if we consider the $K=8$, $N=5$ case the rule table of size $8^5 = 32,768$ is reduced to a rule table of size $8,352$ (see Appendix \ref{appB:rot} for calculation). To generate these tables, we iterate over all $K^N$ possible neighborhood values, canonicalize their string representations by finding their lexicographically minimal rotation, and track only the unique neighborhoods. For example, in the $K=8, N=5$ case, neighborhoods ``0110'' and ``1001'' map to the same minimal rotation neighborhood of ``0011''. We then append a center state value to the end of this canonical neighborhood representation, thus creating the keys for our $\lambda$ rule table mapping with the values being the output state corresponding to that particular neighborhood configuration.
+In the $\lambda$ experiments performed by \citeauthor{wo90}, rule tables must be \textit{isotropic} in that all planar rotations of a particular neighborhood configuration map to the same output cell state; this condition removes the global property of spatial orientation from influencing rule transitions~\cite{av00,wo90}. As a result, what would be a $K^N$ sized table results in a smaller table because only rotationally distinct neighborhood configurations are unique entries: specifically, if we consider the $K=8$, $N=5$ case the rule table of size $8^5 = 32,768$ is reduced to a rule table of size $8,352$ (see Appendix \ref{appB:rot} for calculation). To generate these tables, we iterate over all $K^N$ possible neighborhood values, canonicalize their string representations by finding their \textit{lexicographically minimal rotation}, and track only the unique neighborhoods. For example, in the $K=8, N=5$ case, neighborhoods ``0110'' and ``1001'' map to the same minimal rotation neighborhood of ``0011''. We then append a center state value to the end of this canonical neighborhood representation, thus creating the keys for our $\lambda$ rule table mapping with the output state for that particular neighborhood configuration as the value.
 %TODO reword last sentence
 
 \processdelayedfloats
@@ -642,7 +648,8 @@ H = -\left[ v \log v + 7\left(\frac{1-v}{7}\right)\log\left(\frac{1-v}{7}\right)
 \end{equation}
 
 \chapter{Miscellaneous}
-
+\section{Grid Input File Format}
+\label{appB:grid_in}
 \begin{figure}
 \centering
 %TODO figure out best way to represent input grid file: straight text or picture?
