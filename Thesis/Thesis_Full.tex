@@ -27,8 +27,6 @@
 
 \begin{document}
 
-
-
 \title{Computation in the Wild: Reconsidering Dynamic Systems in Light of Irregularity}
 %TODO Spatial Irregularity?
 
@@ -354,7 +352,7 @@ Our CA simulation platform consists of a collection of data structures that are 
 
 \begin{itemize}
 
-\item \textbf{Grid:} The \textit{Grid} structure stores both the geometric representation of a grid and the graph representation of a grid. The graph is implemented as an adjacency list because we expect the graph of a CA grid to be relatively sparse. Grids will be explored in more detail in Section \ref{sec:GridGen}.
+\item \textbf{Grid:} The \textit{Grid} structure stores both the geometric representation of a grid and the graph representation of a grid. The graph is implemented as an adjacency list because we expect the graph of a CA grid to be relatively sparse.
 
 \item \textbf{Stencil:} A \textit{Stencil} determines the local neighborhood for each cell in a Grid. Possible Stencils include considering all cells that share an edge with the center cell the neighborhood or considering all cells that share a vertex with the center cell the neighborhood. These Stencils can be thought of as generalized von Neumman and Moore neighborhoods, respectively.
 
@@ -364,18 +362,28 @@ Our CA simulation platform consists of a collection of data structures that are 
 
 \end{itemize}
 
-%s, while Stencils and Rule Tables will be explored in Section \ref{sec:StencilGen}.
+Grids will be explored in more detail in Section \ref{sec:GridGen}, while Stencils and Rule Tables will be explored in Section \ref{sec:StencilGen}. A schematic of our overall program architecture is pictured in Figure \ref{fig:sys_arch}.
 
-\subsection{Output Files and Data Analysis}
+\begin{figure}[htp]
+\centering
+%Build System Schematic picture
+%\includegraphics[width=0.4\textwidth]{gen_pts_v2}
+\caption[CA Simulation Class Architecture]{
+	CA Simulation Class Architecture TODO
+}
+\label{fig:sys_arch}
+\end{figure}
 
-We have a standardized format for storing and reading in grid configurations, which allows us to easily stop and restore CA simulations as well as save and transfer them across different machines. The visual representation of our grids are built by creating graph descriptions (.dot file extension) for \textbf{neato}, a graph layout program part of the Graphviz drawing package~\cite{el01}. Images of our neato grid representations can be found in Section \ref{sec:GridGen}.
+\subsection{Input/Output Files and Data Analysis}
+
+We have a standardized format for storing and reading in grid configurations, which allows us to easily stop and restore CA simulations as well as save and transfer them across different machines. A representative input grid file can be found in Appendix TODO. The visual representation of our grids are built by creating graph descriptions (.dot file extension) for \textbf{neato}, a graph layout program part of the Graphviz drawing package~\cite{el01}. Images of our neato grid representations can be found in Section \ref{sec:GridGen}.
 
 Measured statistics are exported to .csv files and analyzed using Python with packages from the SciPy ecosystem~\cite{jo14}.
 
 \section{Grid Generation}
 \label{sec:GridGen}
 
-We'll describe the algorithms utilized to generate the various grids we run CA simulations on.
+In this section we'll describe the algorithms utilized to generate the various grids we run CA simulations on.
 
 \subsection{Penrose Tilings}
 
@@ -458,7 +466,7 @@ Given a Delaunay Triangulation, we can produce its corresponding Voronoi Diagram
 \end{figure}
 \subsection{Voronoi Quadrilaterals}
 \label{subsec:vquad}
-Experiments and simulations involving $\lambda$ require static neighborhood sizes across all cells in the grid. One way we address this requirement is by generating irregular grids that have cells of the same number of sides. Specifically, given a Voronoi Diagram we can further partition the region such that all cells in the plane are quadrilaterals. This conversion is accomplished by taking two edge-adjacent Voronoi polygons and forming a quad from the two generator points and the end points of the shared common edge between the polygons (Figure \ref{fig:vquad_gen})~\cite{am10}. As long as the given Voronoi Diagram is ``well-formed,'' specifically with generator points placed a minimum radius from each other, this quadrilateral generation is possible across an entire Voronoi diagram, as seen in Figure \ref{fig:vquad_grid}. Note that though cells in the resulting \textit{VQuad} grid always share edges with four other neighboring cells (excluding the boundary) resulting in uniform generalized von Neumman neighborhood sizes across the grid, the number of cells they share vertices with are variable. This variability in vertex adjacency is partially due to the presence of concave quadrilaterals in the resulting grid. %TODO tessellation right here?
+Experiments and simulations involving $\lambda$ require static neighborhood sizes across all cells in the grid. One way we address this requirement is by generating irregular grids that have cells of the same number of sides. Specifically, given a Voronoi Diagram we can further partition the region such that all cells in the plane are quadrilaterals. This conversion is accomplished by taking two edge-adjacent Voronoi polygons and forming a quad from the two generator points and the end points of the shared common edge between the polygons (Figure \ref{fig:vquad_gen})~\cite{am10}. As long as the given Voronoi Diagram is ``well-formed,'' specifically with all generator points placed at least some minimum radius from each other, this quadrilateral generation is possible across an entire Voronoi diagram, as seen in Figure \ref{fig:vquad_grid}. Note that though cells in the resulting \textit{VQuad} grid always share edges with four other neighboring cells (excluding the boundary) resulting in uniform generalized von Neumman neighborhood sizes across the grid, the number of cells they share vertices with are variable. This variability in vertex adjacency is partially due to the presence of concave quadrilaterals in the resulting grid. %TODO tessellation right here?
 
 \begin{figure}[htp]
 \centering
@@ -471,8 +479,7 @@ Experiments and simulations involving $\lambda$ require static neighborhood size
 
 \begin{figure}[htp]
 \centering
-%TODO add vquad grid
-%\includegraphics[width=0.5\textwidth]{vquad_generation}
+\includegraphics[width=1.0\textwidth]{vquad_stoma}
 \caption[Voronoi Quad Grid]{
   A representative Voronoi Quad grid, generated from the same set of generator points as Figure 
   \ref{fig:voronoi_gen}.
@@ -480,34 +487,54 @@ Experiments and simulations involving $\lambda$ require static neighborhood size
 \label{fig:vquad_grid}
 \end{figure}
 
-
 \subsection{Grid Degeneration}
 In Chapter \ref{ch:lambda_degen}, we consider various degenerated Voronoi Quad grids
-in our examination of the $\lambda$ parameter. We will discuss the methods for generating 
-these degraded grids here.
+in our examination of the $\lambda$ parameter. We will discuss the methods for generating these degraded grids here.
 
 \subsubsection{Generator Point Removal}
 As noted in Section \ref{subsec:vquad}, VQuad grid generation is dependent on the position of Voronoi generator points in the input Voronoi diagram. Thus, one manner of grid degeneration is simply to remove generator points from the input diagram. Since a generator point in the input diagram could be a vertex to many VQuad cells, generator point removal has the effect of taking out large chunks of the VQuad grid, as pictured in \ref{fig:genpt_degen}.
 
 \begin{figure}
 \centering
-%TODO add genpt_degen figure
-%\includegraphics[width=0.5\textwidth]{vquad_generation}
+\includegraphics[width=1.0\textwidth]{gen_pt_degen_7}
 \caption[Generator Point Degradation]{
-  A VQuad grid degraded by the removal of input generator points. Notice the lack of small ``holes'' in the resulting grid.
+  A VQuad grid degraded by the removal of 7\% of the input generator points. Notice the lack of small, (particularly single cell) ``holes'' in the resulting grid.
 }
 \label{fig:genpt_degen}
 \end{figure}
 
 \subsubsection{Crosshatching Degeneration}
+Though generator point removal provides a simple way to degrade a grid, we wanted finer-grained control over how points and edges are removed. Thus we devised a manner of degradation that allowed us to specify what local regions of the grid would be disconnected from other portions of the grid. This basic premise is to draw vertical and horizontal lines at regular width $w$ intervals apart that subdivide the irregular grid roughly into square lattice regions. Cell edges that intersect these \textit{crosshatchings} are removed from the grid with some probability $p$: cells that were formerly connected by the edge no longer are neighbors in the graph representation of the grid. Thus at $p=1.0$ we would have completely isolated ``islands'' of grid subregions. This \textit{crosshatching degeneration} technique allows us control over the degree of regional connectivity, as pictured in Figure \ref{fig:crosshatch_degen}. This manner of degradation preserves the number of cells present in the grid, instead introducing degradation by decreasing edge adjacency. Though we primarily use crosshatching degeneration as a form of edge removal, this technique also gives us a way to control generator point removal: since the crosshatchings define a square lattice partitioning of the grid, we can also choose square regions to remove with some probability $p$. Any generator points sitting within the boundary of a chosen square region will be removed from the graph. Thus we can control both the frequency of generator points removed (through adjusting $p$) as well as the average size of the of the regions removed (through adjusting $w$). This crosshatching technique allows us to parameterize the degeneration of a grid beyond simply measuring average neighborhood size.
+
+\begin{figure}
+\centering
+%TODO add crosshatch degeneration figure
+%\includegraphics[width=1.0\textwidth]{gen_pt_degen_7}
+\caption[Crosshatching Degeneration]{
+	Crosshatching Degeneration caption TODO
+}
+\label{fig:crosshatch_degen}
+\end{figure}
 
 \section{Stencil and Table Implementation}
 \label{sec:StencilGen}
+\subsection{Generalized von Neumman and Moore Neighborhoods}
+We would like to maintain a notion of both von Neumman and Moore neighborhoods even on irregular grids. Thus we formally define \textit{generalized} notions of both neighborhood stencils: a \textit{generalized von Neumman neighborhood} for a cell $c$ is defined as all cells that share an edge with $c$, while a \textit{generalized Moore neighborhood} for $c$ is defined as all cells that share a vertex with $c$. These generalized neighborhood definitions are not necessarily equivalent to their standard definitions. For example, while the generalized von Neumman neighborhood for Voronoi Quad grids is identical to the regular case, the generalized Moore neighborhoods are not uniform across the grid and may have neighborhood sizes ranging from 6 to 12. Because we maintain geometry maps in our system, defining either neighborhood stencil is straightforward for any CA simulation on any grid.
+
+\subsection{$\lambda$ Rule Tables}
+%wolfram command is: rotations with 4 beads, 8 colors
+%TODO Burnside's lemma?
+In the $\lambda$ experiments performed by \citeauthor{wo90}, rule tables must be \textit{isotropic} in that all planar rotations of a particular neighborhood configuration map to the same output cell state; this condition removes the global property of spatial orientation from influencing rule transitions~\cite{av00,wo90}. As a result, what would be a $K^N$ sized table results in a smaller table because only rotationally distinct neighborhood configurations are unique entries: specifically, if we consider the $K=8$, $N=5$ case the rule table of size $8^5 = 32,768$ is reduced to a rule table of size $8,352$ (see Appendix \ref{appB:rot} for calculation). To generate these tables, we iterate over all $K^N$ possible neighborhood values, canonicalize their string representations by finding their lexicographically minimal rotation, and track only the unique neighborhoods. For example, in the $K=8, N=5$ case, neighborhoods ``0110'' and ``1001'' map to the same minimal rotation neighborhood of ``0011''. We then append a center state value to the end of this canonical neighborhood representation, thus creating the keys for our $\lambda$ rule table mapping with the values being the output state corresponding to that particular neighborhood configuration.
+%TODO reword last sentence
 
 \processdelayedfloats
 
 \chapter{Penrose Life Experiments}
 \label{ch:penrose}
+
+\begin{itemize}
+\item run lambda experiments for K=3, N=11 grids? (penrose glider)
+\end{itemize}
 
 \chapter{Local Majority Experiments}
 \label{ch:local_maj}
@@ -515,8 +542,19 @@ As noted in Section \ref{subsec:vquad}, VQuad grid generation is dependent on th
 \chapter{Lambda Degradation Experiments}
 \label{ch:lambda_degen}
 
-\chapter{Discussion and Conclusion}
-\label{ch:discussion}
+%TODO move this into individual experiment chapters?
+\chapter{Future Work}
+\label{ch:future_work}
+
+\begin{itemize}
+
+\item majority task experiments beyond local majority
+\item adaptation of $\gamma$ parameter to irregular 2D grids
+
+\end{itemize}
+
+\chapter{Conclusion}
+\label{ch:conclusion}
 
 \begin{appendices}
 
@@ -530,7 +568,6 @@ As noted in Section \ref{subsec:vquad}, VQuad grid generation is dependent on th
 \begin{equation}
 \lambda = \frac{K^N - n}{K^N} 
 \end{equation}
-
 
 \section{Gamma}
 \label{appA:gamma}
@@ -551,7 +588,6 @@ The overall difference spreading rate $\gamma$ is then:
 \begin{equation}
 \gamma(a) = \gamma_{left}(a) + \gamma_{right}(a)
 \end{equation}
-
 
 \section{Shannon Entropy}
 \label{appA:entrop}
@@ -593,12 +629,11 @@ In order to estimate $\gamma$, first calculate $\lambda$ using the cellular auto
 
 \pagebreak
 
-\citeauthor{wo90} utilize mean-field theory to estimate the entropy $H$ of a 2D cellular automata with $K=8$ and $N=5$~\cite{wo90}. Let $v$ be the density of the quiescent state $s_q$ in the spatial configuration, so $v=1$ would indicate a configuration of all $s_q$. In a cellular automata's steady state the following equation is satisfied:
+\citeauthor{wo90} utilize mean-field theory to estimate the entropy $H$ of a 2D cellular automata with $K=8$ and $N=5$~\cite{wo90}. Let $v$ be the density of the quiescent state $s_q$ in the spatial configuration, so $v=1$ would indicate a configuration of all $s_q$. $K=8$, $N=5$ Cellular automata in their steady state will satisfy the following equation:
 
 \begin{equation}
 v = v^5 + (1 - v^5)(1- \lambda)
 \end{equation}
-
 
 Then, assuming that the other seven states appear equally often in the transition rules $\Delta$, we can estimate $H$:
 
@@ -606,6 +641,23 @@ Then, assuming that the other seven states appear equally often in the transitio
 H = -\left[ v \log v + 7\left(\frac{1-v}{7}\right)\log\left(\frac{1-v}{7}\right)\right]
 \end{equation}
 
+\chapter{Miscellaneous}
+
+\begin{figure}
+\centering
+%TODO figure out best way to represent input grid file: straight text or picture?
+%Embed code
+%\includegraphics[width=1.0\textwidth]{gen_pt_degen_7}
+\caption[Canonical Grid Data File]{
+	TODO
+}
+\label{fig:gridfile}
+\end{figure}
+
+\section{Calculating Unique Rotations in a $\lambda$ Transition Table}
+\label{appB:rot}
+TODO
+\processdelayedfloats
 \end{appendices}
 
 \bibliographystyle{plainnat}
