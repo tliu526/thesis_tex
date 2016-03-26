@@ -414,9 +414,9 @@ Grid Generators will be reviewed in more detail in Section \ref{sec:GridGen}, wh
 
 \draw [arrow] (expr) -- (sim);
 \draw [arrow] (sim) -- (grid_gen);
-\draw [arrow] (sim) -- (rule_table);
-\draw [arrow] (sim) -- (stencil);
-
+\draw [arrow] (grid_gen) -- (rule_table);
+\draw [arrow] (grid_gen) -- (stencil);
+\draw [arrow] (grid_gen) -- (geo);
 
 \end{tikzpicture}
 
@@ -439,55 +439,6 @@ In this section we'll describe the algorithms utilized to generate the various g
 
 \subsection{Penrose Tilings}
 To generate Penrose Tilings and Penrose-connected graphs, we use inflation processes to recursively generate the tiling. \citeauthor{ro71}'s triangle recursive decomposition technique is utilized to draw both kite/dart and thin/thick rhomb tilings, except full tiles are drawn instead of individual triangles~\cite{ro71}. Though drawing full tiles will likely result in tiles being considered and drawn multiple times, we avoid this by marking faces as they are drawn, only keeping a single copy of each face. As in all our grid generation programs, we track geometric primitives (\texttt{Point}, \texttt{Edge}, \texttt{Face}) to make generating our standard grid input file straightforward.
-
-/*
- * This program generates images of penrose tilings and penrose-connected
- * graphs.  Its main use is with Tony Liu's software to perform CA simulations
- * on general graphs.
- *
- * The approach used here is to recursively generate patches of a tiling
- * through inflation processes.  It supports kite/dart and thin/thick rhomb
- * tilings by modeling Rapheal Robinson's recursive decomposition.  However,
- * instead of drawing triangles, this program draws the full associated tile.
- * Thus many tiles encountered in the decomposition have the potential to
- * be drawn multiple times.  To avoid this, we ``'register'' faces as they're
- * encountered, keeping only one copy of each encountered.
- *
- * Points that are mentioned during this process are stored in a point list.
- * The index of the point in this list is used, then, as a shorthand for
- * that location.  Faces are collections of four point indices, with the
- * smallest index first, and the smallest neighbor second.  For some
- * purposes (notably for the generation of Liu-style graphs), it is helpful
- * to have a notion of edges.  When necessary, edges are constructed as pairs
- * of point indices with the smaller index first.
- *
- * All objects are placed in a coordinate space whose unit size is 1/72",
- * a PostScript point.  This is arbitrary, but makes the generation of
- * PostScript output easier.  To support affine transformations, a small
- * transformation system is provided that allows translation, rotation, and
- * scaling of 2D coordinate systems.  It is compactly stored and models, loosely
- * the approach used by PostScript.  For example, the transformation matrix
- * is stored as a 3x2 matrix since the last column can be fixed.  When
- * necessary, the current graphics transform (currentMatrix) can be pushed
- * on a graphics context stack with gsave and later restored with grestore.
- * This allows routines to save and reset the graphics transformation system
- * for use in scaling, rotatating, and translating the final image in a
- * PostScript output (which centers the image in the center of a page) or
- * for supporting rescaling for use within a fixed coordinate viewport centered
- * around the origin.
- *
- * Registerface may fail to register the face (and thus not include it in
- * the final output) if all of the points are more distant than `radius' away.
- *
- * All searches of lists are linear, and in many cases the searches are
- * obviously inefficient and could be improved with additional data structures.
- *
- * There is heavy use of dynamic memory allocation with little concern about
- * freeing or collecting garbage.  Obviously, this could be improved.
- *
- * This software is free and distributed as-is, and is not suitable for any
- * particular purpose.
- */
 
 
 \subsection{Delaunay Triangulations and Voronoi Diagrams}
@@ -587,12 +538,16 @@ In the $\lambda$ experiments performed by \citeauthor{wo90}, rule tables must be
 \chapter{Penrose Life Experiments}
 \label{ch:penrose}
 
-We begin our exploration of irregular CA by considering aperiodic tilings. Specifically, we build upon work done by \citeauthor{hi05} (see Chapter \ref{subsec:gol}) in examining the Game of Life on Penrose Tilings. Aperiodicity is a move away from the regularity found in square lattices but still maintains some local neighborhood structure. 
+We begin our exploration of irregular CA by considering aperiodic tilings. Specifically, we build upon work done by \citeauthor{hi05} (see Chapter \ref{subsec:gol}) in examining the Game of Life on Penrose Tilings. Aperiodicity is a move away from the regularity found in square lattices but still maintains some local neighborhood structure (TODO more explanation of the link between aperiodic and irregularity, insert neighborhood figure from Owen/Stepney?). Our goal is to investigate the potential for information transfer across an irregular CA space. In the case of Game of Life, moving particles named \textit{gliders} are the most basic representation of information transfer across a regular grid. However, these gliders exploit the regularity of the grid in their movement and as a result are not robust to changes in their immediate environment: 99\% of possible environment configurations a glider can encounter will be destructive to it. Thus, these Penrose Life investigations explore the possibility of moving particles in a CA grid that relaxes some of the regularity found in standard square lattices.     
 
 \section{Replication and Extension of \citeauthor{hi05}'s Work}
 
 \begin{itemize}
-\item 
+\item lifetime to stability/ash density against lifetime replication
+\item Long Penrose Life Run
+\item Comparison between Kite/Darts and Rhomb Penrose Grids
+\item Neighborhood analysis
+\item Subregion Lifetime analysis
 \end{itemize}
 
 TODOs
