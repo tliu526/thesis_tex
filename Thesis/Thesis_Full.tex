@@ -6,6 +6,17 @@
 \usepackage{setspace}
 \usepackage{courier}
 
+
+%For flowcharts
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+
 %\usepackage{todonotes}
 
 \usepackage[titletoc, title]{appendix}
@@ -38,8 +49,9 @@
 % for chapter headings
 
 
-%TODO
-%\chapter*{Abstract}
+
+\chapter*{Abstract}
+
 
 \chapter{Introduction}
 \label{ch:Intro}
@@ -107,7 +119,7 @@ These cellular-based computing architectures are not without their own limitatio
 
 What are the requisite conditions for computation to emerge from a dynamical system?
 It has been shown that various CA systems can support universal computation~\cite{wf86}, but what are the particular characteristics that allow for computation to be possible?
-Computational constructs such as Turing machines and other equivalent entities are built upon three fundamentals that can be formulated in the dynamics of a CA system. The system must be able to support the \textit{storage} of information, with the ability to preserve information for arbitrary time periods. Information \textit{transmission} across arbitrarily long distances must also be possible in the environment. Finally, there must be some mechanism for information \textit{interaction} with the potential for information to be transformed or modified~\cite{la90}. These properties are necessary for any dynamical system, automata or otherwise, to have the capacity for computation, but are not sufficient to give rise to computation by their presence alone.
+nnComputational constructs such as Turing machines and other equivalent entities are built upon three fundamentals that can be formulated in the dynamics of a CA system. The system must be able to support the \textit{storage} of information, with the ability to preserve information for arbitrary time periods. Information \textit{transmission} across arbitrarily long distances must also be possible in the environment. Finally, there must be some mechanism for information \textit{interaction} with the potential for information to be transformed or modified~\cite{la90}. These properties are necessary for any dynamical system, automata or otherwise, to have the capacity for computation, but are not sufficient to give rise to computation by their presence alone.
 \citeauthor{la90} also establishes the notion of dynamical systems undergoing ``physical'' phase transitions between highly ordered to highly disordered dynamics, with the most interesting behavior occurring within the boundaries of this transition. This transition region is also where the three requisite properties of computation often occur. Thus, the hypothesis \citeauthor{la90} claimed is that computation can spontaneously emerge and dominate the dynamics of a physical system when such a system is at or near such a ``critical transition'' point~\cite{la90}. 
 
 \subsection{Metrics}
@@ -279,7 +291,7 @@ Additionally, the neighborhood definitions are entirely dependent on the structu
 % TODO more here
 
 \subsection{Spatial Variation of Conway's Game of Life}
-
+\label{subsec:gol}
 The Game of Life, discovered by John Conway, is a $K=2$, $N=9$ two-dimensional cellular automaton that is particularly remarkable because of both the rich emergent structures it can generate as well as its Turing universality~\cite{ga70}. Most instances of the Game of Life are played on regular, two dimensional lattices; what changes in behavior occur when it is simulated on an aperiodic \textit{Penrose tiling}? \citeauthor{hi05} examined this variation, and in particular ran experiments that explored the \textit{lifetimes} (number of generations until stabilization) as well as  \textit{ash densities} (the fraction of ``on'' cells in a stabilized configuration) of random initial configurations. The Game of Life on the Penrose tiles have lifetimes that are much shorter and ash accumulation half as dense as games played on the regular lattice~\cite{hi05}; this is likely due to the irregularity in the tiling distribution, illustrating that at least in this instance, the variable neighborhood sizes across the grid make it more difficult to maintain coherent structures. It should be noted however that \citeauthor{hi05} directly translated the rules of the Game of Life onto the Penrose tiling without any modification, which may not be appropriate since a given cell may have either eight or nine neighbors as opposed to the constant eight neighbors in traditional Life instances. An alternative rule set would be to define the ``living'' criteria based on a ratio or percentage of live cells in the surrounding area, as it would produce appropriately dynamic behavior that aligns with the variability in the tilings. This addition is an extension on these initial experiments that may be more revealing to the overall relationship between the Game of Life played on a grid and more irregular environments like Penrose tiles. 
 
 To take spatial representations to one extreme, the concept of a grid can be removed altogether. \textit{SmoothLife} is the result, where instead of cells on a grid individual points within the Cartesian space is considered and transition rules are defined for a point's circular neighborhood~\cite{ra11}. In SmoothLife's spatial representation, Euclidean distance is respected in regard to neighborhood definitions resulting in a true spatial representation of connectivity. Unfortunately, SmoothLife represents too radical a shift away from the discrete dynamic systems we have been considering with the lack of spatial structure entirely. Ideally, spatial representations of Euclidean distance and resulting neighborhood connections should be preserved while still maintaining a discrete structure. Voronoi diagrams possess these exactly traits, and so we will consider Voronoi-based CA systems next.
@@ -345,7 +357,7 @@ Our CA simulation platform follows an event-driven architecture written in C++; 
 %TODO move around?
 We designed this system primarily with flexibility in mind. Modular components and data structures can easily be swapped in and out of the simulation platform, giving us fine-grained control over the experiments we are running. Performance is not a major concern, so long as simulations and experiments can complete within a reasonable amount of time: for reference an experiment that runs 1,000 simulations 500 time steps each, writing data to disk at every time step for all simulations takes a few hours in total to complete.
 
-
+%A CA simulation begins by reading in an input grid file, initializing all 
 
 Termination of the CA simulation occurs either when a maximum time step is reached, or when a grid state is repeated. We track grid states by walking through all cells on a grid in a consistent order, appending each cell state to a string array and then passing the resulting string through a hash function. We keep a history of these hashes along with the time step they occur, and terminate the simulation if a hash is ever repeated. Recording the time step also allows us to track the periodicity of any potential oscillating structures occurring within the simulation.
 
@@ -356,42 +368,77 @@ Our CA simulation platform consists of a collection of data structures that are 
 
 \begin{itemize}
 
-\item \textbf{Grid:} The \textit{Grid} structure stores both the geometric representation of a grid and the graph representation of a grid. The graph is implemented as an adjacency list because we expect the graph of a CA grid to be relatively sparse.
+\item \textbf{Grid Generators:} The \texttt{GridGenerator} structure stores both the geometric representation of a grid and the graph representation of a grid. The graph is implemented as an adjacency list as we expect the graph of a CA grid to be relatively sparse due to the strictly local connectivity.
 
-\item \textbf{Stencil:} A \textit{Stencil} determines the local neighborhood for each cell in a Grid. Possible Stencils include considering all cells that share an edge with the center cell the neighborhood or considering all cells that share a vertex with the center cell the neighborhood. These Stencils can be thought of as generalized von Neumman and Moore neighborhoods, respectively.
+\item \textbf{Stencil:} A \texttt{Stencil} determines the local neighborhood for each cell in a Grid. Possible stencils include ``generalized'' von Neumman and Moore neighborhoods or ``continuous'' stencils that weight neighbors by their distance from the center cell.
 
-\item \textbf{Rule Table:} A \textit{Rule Table} represents a transition rule, utilizing a Stencil to determine a cell's neighborhood and compute its next state.
+\item \textbf{Rule Table:} A \texttt{RuleTable} represents a transition rule, utilizing a Stencil to determine a cell's neighborhood and compute its next state.
 
-\item \textbf{Geometry Maps:} Maps and reverse maps from labels to geometric objects such as points, edges, and faces are maintained for easy object access and grid manipulation.
+\item \textbf{Geometry Maps:} Maps and reverse maps from labels to geometric objects such as \texttt{Points}, \texttt{Edges}, and \texttt{Faces} are maintained for easy object access and grid manipulation.
 
 \end{itemize}
 
-Grids will be explored in more detail in Section \ref{sec:GridGen}, while Stencils and Rule Tables will be explored in Section \ref{sec:StencilGen}. A schematic of our overall program architecture is pictured in Figure \ref{fig:sys_arch}.
+Grid Generators will be reviewed in more detail in Section \ref{sec:GridGen}, while Stencils and Rule Tables will be discussed in Section \ref{sec:StencilGen}. A schematic of our overall program architecture is pictured in Figure \ref{fig:sys_arch}.
 
 \begin{figure}[htp]
 \centering
 %Build System Schematic picture
 %\includegraphics[width=0.4\textwidth]{gen_pts_v2}
-\caption[CA Simulation Class Architecture]{
-	CA Simulation Class Architecture TODO
+\begin{tikzpicture}[node distance=2cm]
+\node (expr) [process] {\texttt{Experiment.h}};
+
+\node (sim) [process, below of=expr] {\texttt{Simulator.h}};
+
+\node (grid_gen) [process, below of=sim] {\texttt{GridGenerator.h}};
+
+\node (rule_table) [process, align=center, below of=grid_gen, yshift=-0.5cm] {
+	\underline{\texttt{RuleTable.h}}\\
+	\texttt{LMRule.h}\\
+	\texttt{LifeRule.h}\\
+	\texttt{GKLRule.h}\\
+	\texttt{LambdaRule.h}
+};
+
+\node (stencil) [process, align=center, right of=rule_table, xshift=2.5cm] {
+	\underline{\texttt{Stencil.h}}\\
+	\texttt{VNStencil.h}\\
+	\texttt{MooreStencil.h}\\
+};
+
+\node (geo) [process, left of=rule_table, align=center, xshift=-2.5cm] {
+	\underline{Geometric Primitives}\\
+	\texttt{Poly.h}\\
+	\texttt{Edge.h}\\
+	\texttt{Point.h}
+};
+
+\draw [arrow] (expr) -- (sim);
+\draw [arrow] (sim) -- (grid_gen);
+\draw [arrow] (sim) -- (rule_table);
+\draw [arrow] (sim) -- (stencil);
+
+
+\end{tikzpicture}
+
+\caption[CA Simulation Platform Architecture]{
+	CA Simulation Class Architecture
 }
 \label{fig:sys_arch}
 \end{figure}
 
 \subsection{Input/Output Files and Running Our System}
 
-We have a standardized format for storing and reading in grid configurations, which allows us to easily stop and restore CA simulations as well as save and transfer them across different machines. A representative input grid file can be found in Appendix \ref{appB:grid_in}. The visual representation of our grids are built by creating graph descriptions (.dot file extension) for \textbf{neato}, a graph layout program part of the Graphviz drawing package~\cite{el01}. Images of our neato grid representations can be found in Section \ref{sec:GridGen}. Measured statistics are exported to .csv files and analyzed using Python with packages from the SciPy ecosystem~\cite{jo14}.
+We have a standardized format for storing and reading in grid configurations, which allows us to easily pause and restore CA simulations as well as save and transfer them across different machines. A representative input grid file can be found in Appendix \ref{appB:grid_in}. The visual representation of our grids are built by creating graph descriptions for \textbf{neato}, a graph layout program part of the Graphviz drawing package~\cite{el01}. Images of our neato grid representations can be found in Section \ref{sec:GridGen}. Measured statistics are exported to .csv files and analyzed using Python with packages from the SciPy ecosystem~\cite{jo14}.
 
-We utilize the GNU package \texttt{getopt} to pass Unix-style command line arguments to our system, making batching experiments to be run across multiple machines 
+We utilize the GNU C library package \texttt{getopt} to pass Unix-style command line arguments to our system, making experiments easily scripted and batched across multiple machines.
 
-A CA simulation begins by reading in an input grid file, initializing all 
 \section{Grid Generation}
 \label{sec:GridGen}
 
 In this section we'll describe the algorithms utilized to generate the various grids we run CA simulations on.
 
 \subsection{Penrose Tilings}
-To generate Penrose Tilings and Penrose-connected graphs, we utilize inflation processes to recursively generate the tiling. We utilize \citeauthor{ro71}'s triangle recursive decomposition to draw both kite/dart and thin/thick rhomb tilings, except full tiles are drawn instead of individual triangles~\cite{ro71}. Though drawing full tiles will likely result in tiles being considered and drawn multiple times, we avoid this by marking faces as they are drawn, only keeping a single copy of each face. As in all our grid generation programs, we track geometric primitives (\texttt{Point}, \texttt{Edge}, \texttt{Face}) to make generating our standard grid input file straightforward.
+To generate Penrose Tilings and Penrose-connected graphs, we use inflation processes to recursively generate the tiling. \citeauthor{ro71}'s triangle recursive decomposition technique is utilized to draw both kite/dart and thin/thick rhomb tilings, except full tiles are drawn instead of individual triangles~\cite{ro71}. Though drawing full tiles will likely result in tiles being considered and drawn multiple times, we avoid this by marking faces as they are drawn, only keeping a single copy of each face. As in all our grid generation programs, we track geometric primitives (\texttt{Point}, \texttt{Edge}, \texttt{Face}) to make generating our standard grid input file straightforward.
 
 /*
  * This program generates images of penrose tilings and penrose-connected
@@ -452,14 +499,14 @@ The first step in the process to generate a Voronoi-based grid is to produce gen
 \centering
 \includegraphics[width=0.4\textwidth]{gen_pts_v2}
 \caption[Random Point Generation]{
-	On the left, a random uniform distribution of points. On the right, a random distribution of points generated by Poisson Disk Sampling.
+	On top, a random uniform distribution of points. On bottom, a random distribution of points generated by Poisson Disk Sampling.
 }
 \label{fig:pt_gen}
 \end{figure}
 
-Once we have a set of generator points, we construct the dual graph of the Voronoi Diagram, known as the \textit{Delaunay Triangulation}. The Delaunay Triangulation of a set of points $\{p_1, ..., p_n\}$ in the plane is a triangulation such that no point $p_k$ resides inside the circumcircle of a triangle; an edge $e$ is considered to be \textit{locally Delaunay} if the two triangles that share $e$ as a common edge satisfy the circumcircle condition~\cite{de11}. We construct this dual graph first because (1) the edges of the Delaunay Triangulation exactly correspond to the graph connectivity of the Voronoi grid produced by the set of points and (2) the Voronoi Diagram is easy to construct from the triangulation. We utilize the \textit{flip} algorithm to construct the Delaunay Triangulation: beginning with an arbitrary triangulation, edges that are not locally Delaunay are ``flipped'' such that they are locally Delaunay. Once there are no more edges to be flipped, then the resulting triangulation must be a Delaunay Triangulation~\cite{ed08}. Though the flip algorithm is not the fastest Delaunay Triangulation algorithm, it is straightforward, requires no auxiliary data structures, and performs well enough for our purposes.
+Once we have a set of generator points, we construct the dual graph of the Voronoi Diagram, known as the \textit{Delaunay Triangulation}. The Delaunay Triangulation of a set of points $\{p_1, ..., p_n\}$ in the plane is a triangulation such that no point $p_k$ resides inside the circumcircle of a triangle; an edge $e$ is considered to be \textit{locally Delaunay} if the two triangles that share $e$ as a common edge satisfy the circumcircle condition~\cite{de11}. We construct this dual graph first because (1) the edges of the Delaunay Triangulation exactly correspond to the graph connectivity of the Voronoi grid produced by the set of points and (2) the Voronoi Diagram is easy to construct from the triangulation. We utilize the \textit{flip algorithm} to construct the Delaunay Triangulation: beginning with an arbitrary triangulation, edges that are not locally Delaunay are ``flipped'' such that they are locally Delaunay. Once there are no more edges to be flipped, then the resulting triangulation must be a Delaunay Triangulation~\cite{ed08}. Though the flip algorithm is not the fastest Delaunay Triangulation algorithm, it is straightforward, requires no auxiliary data structures, and performs well enough for our purposes.
 
-Given a Delaunay Triangulation, we can produce its corresponding Voronoi Diagram by calculating the circumcenter of each Delaunay triangle and creating an edge between the circumcenters of adjacent triangles~\cite{ed08,de11}. The circumcenters of the triangles correspond to Voronoi polygon vertices, so we obtain valid Voronoi regions. Thus we have obtained both the graph representation and the geometric representation of a Voronoi-based grid. An illustration of this process is shown in Figure \ref{fig:voronoi_gen}.
+Given a Delaunay Triangulation, we can produce its corresponding Voronoi Diagram by calculating the circumcenter of each Delaunay triangle and creating an edge between the circumcenters of adjacent triangles~\cite{de11,ed08}. The circumcenters of the triangles correspond to Voronoi polygon vertices, so we obtain valid Voronoi regions. Thus we have obtained both the graph representation and the geometric representation of a Voronoi-based grid. An illustration of this process is shown in Figure \ref{fig:voronoi_gen}.
 
 \begin{figure}[htp]
 \centering
@@ -476,7 +523,7 @@ Experiments and simulations involving $\lambda$ require static neighborhood size
 
 \begin{figure}[htp]
 \centering
-\includegraphics[width=0.5\textwidth]{vquad_generation}
+\includegraphics[width=0.75\textwidth]{vquad_generation}
 \caption[Voronoi Quad Generation]{
 	An illustration of the Voronoi quadrilateral creation process. Generator points $A$ and $B$ are connected with the shared edge endpoints $1$ and $2$ to create the quadrilateral pictured on the right. Figure adapted from \citeauthor{am10}~\cite{am10}. 
 }
@@ -485,7 +532,7 @@ Experiments and simulations involving $\lambda$ require static neighborhood size
 
 \begin{figure}[htp]
 \centering
-\includegraphics[width=1.0\textwidth]{vquad_stoma}
+\includegraphics[width=1.0\textwidth]{vquad_stoma_v2}
 \caption[Voronoi Quad Grid]{
   A representative Voronoi Quad grid, generated from the same set of generator points as Figure 
   \ref{fig:voronoi_gen}.
@@ -522,7 +569,7 @@ Though generator point removal provides a simple way to degrade a grid, we wante
 \label{fig:crosshatch_degen}
 \end{figure}
 
-\section{Stencil and Table Implementation}
+\section{Stencil and Rule Table Implementation}
 \label{sec:StencilGen}
 \subsection{Generalized von Neumman and Moore Neighborhoods}
 We would like to maintain a notion of both von Neumman and Moore neighborhoods even on irregular grids. Thus we formally define \textit{generalized} notions of both neighborhood stencils: a \textit{generalized von Neumman neighborhood} for a cell $c$ is defined as all cells that share an edge with $c$, while a \textit{generalized Moore neighborhood} for $c$ is defined as all cells that share a vertex with $c$. These generalized neighborhood definitions are not necessarily equivalent to their standard definitions. For example, while the generalized von Neumman neighborhood for Voronoi Quad grids is identical to the regular case, the generalized Moore neighborhoods are not uniform across the grid and may have neighborhood sizes ranging from 6 to 12. Because we maintain geometry maps in our system, defining either neighborhood stencil is straightforward for any CA simulation on any grid.
@@ -533,11 +580,22 @@ We would like to maintain a notion of both von Neumman and Moore neighborhoods e
 In the $\lambda$ experiments performed by \citeauthor{wo90}, rule tables must be \textit{isotropic} in that all planar rotations of a particular neighborhood configuration map to the same output cell state; this condition removes the global property of spatial orientation from influencing rule transitions~\cite{av00,wo90}. As a result, what would be a $K^N$ sized table results in a smaller table because only rotationally distinct neighborhood configurations are unique entries: specifically, if we consider the $K=8$, $N=5$ case the rule table of size $8^5 = 32,768$ is reduced to a rule table of size $8,352$ (see Appendix \ref{appB:rot} for calculation). To generate these tables, we iterate over all $K^N$ possible neighborhood values, canonicalize their string representations by finding their \textit{lexicographically minimal rotation}, and track only the unique neighborhoods. For example, in the $K=8, N=5$ case, neighborhoods ``0110'' and ``1001'' map to the same minimal rotation neighborhood of ``0011''. We then append a center state value to the end of this canonical neighborhood representation, thus creating the keys for our $\lambda$ rule table mapping with the output state for that particular neighborhood configuration as the value.
 %TODO reword last sentence
 
+\section{Summary?}
+
 \processdelayedfloats
 
 \chapter{Penrose Life Experiments}
 \label{ch:penrose}
 
+We begin our exploration of irregular CA by considering aperiodic tilings. Specifically, we build upon work done by \citeauthor{hi05} (see Chapter \ref{subsec:gol}) in examining the Game of Life on Penrose Tilings. Aperiodicity is a move away from the regularity found in square lattices but still maintains some local neighborhood structure. 
+
+\section{Replication and Extension of \citeauthor{hi05}'s Work}
+
+\begin{itemize}
+\item 
+\end{itemize}
+
+TODOs
 \begin{itemize}
 \item run lambda experiments for K=3, N=11 grids? (penrose glider)
 \end{itemize}
