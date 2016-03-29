@@ -611,10 +611,11 @@ Another goal is to investigate CA behavior at the boundary of the grid. Typical 
 In order to locate where interesting behavior may occur in Penrose Life, we begin by examining the full range of \textit{initial soup densities} (percentage of ON cells in the starting configuration) from $d=0.01$ to $d=0.99$, measuring both \textit{lifetime to stability} (the number of timesteps a given configuration takes to stabilize) and final \textit{ash density} (the percentage of the grid in a stable state).
 
 \subsection{Experimental Setup}
-Both Kite/Dart and Thin/Thick Rhomb Penrose tilings are considered. We utilize circular grids, with the Kite/Dart grid containing 995 cells and Rhomb grid containing 1,075 cells. For each initial soup density we run 100 trials and average our statistics across all the trials, resulting in 9,900 CA simulations which. The tilings are pictured in Figure \ref{fig:penrose_circ}.
+Both Kite/Dart and Thin/Thick Rhomb Penrose tilings are considered. We utilize circular grids, with the Kite/Dart grid containing 995 cells and Rhomb grid containing 1,075 cells. The Rule Table utilizes standard Game of Life rules with generalized Moore neighborhood stencils (Figure TODO). For each initial soup density we run 100 trials and average our statistics across all the trials, resulting in 9,900 CA simulations which. The tilings are pictured in Figure \ref{fig:penrose_circ}.
 
 \subsection{Results}
-Lifetime to Stability and Ash Density graphs for Kites/Darts and Rhombs are pictured in Figure \ref{fig:ckd_lifetime_density} and Figure \ref{fig:crh_lifetime_density}, respectively.
+Lifetime to Stability and Ash Density graphs for Kites/Darts are pictured in Figure \ref{fig:ckd_lifetime_density}. These results agree with the data presented by \citeauthor{hi05} shown in Figure \ref{fig:hi05_lifetime_density}, with our circular tiling falling in between the S and M grids in terms of size: both lifetime graphs have a right-skewed distribution while the ash density plots show little correlation between lifetime and final ash density for initial soup densities of $d=0.20, 0.40, 0.60$. The ash densities fall within a range of about $d=0.00$ to $d=0.03$. It's important to note that the lifetime graphs have the same distribution shape as the standard Game of Life lifetime graph, though the average lifetimes for the Penrose tilings are much lower than the standard grid (Figure \ref{fig:hi05_reg_lifetime}). %TODO moar analysis here?
+This suggests that the overall qualitative behavior of Penrose Life could be similar to the standard Game of Life but also shows that it is much more difficult to maintain coherent Life structures on irregular grids.
 
 \begin{figure}[htp]
 \centering
@@ -649,12 +650,23 @@ Lifetime to Stability and Ash Density graphs for Kites/Darts and Rhombs are pict
 	\includegraphics[width=\textwidth]{ch4_figs/hi05_fig8_ash_density}
 	\caption{Kite/Dart Ash Density Scatter Plot: x-axis = Ash Density, y-axis = Lifetime to Stability}
 \end{subfigure}
-\caption[\citeauthor{hi05}'s Lifetime and Ash Density Graphs]{
-	TODO
+\caption[\citeauthor{hi05}'s Kite/Dart Lifetime and Ash Density Graphs]{
+	Lifetime to Stability and Ash Density graphs for various sized Kite/Dart tilings produced by \citeauthor{hi05}. In Figure (a), the four graphs correspond Penrose grids of increasing size, with the S grid containing 688 tiles, the M grid containing 1,907 tiles, the L grid containing 5,170 tiles, and the XL grid containing 13,900 tiles. The data points pictured in the scatter plot in Figure (b) are from the M grid~\cite{hi05}.
 }
+\label{fig:hi05_lifetime_density}
 \end{figure}
 
-%TODO add figures 
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.6\textwidth]{ch4_figs/hi05_fig6_lifetime}
+\caption[\citeauthor{hi05}'s Standard GoL Lifetime Graph]{
+	The Lifetime to Stability graph for standard grids produced by \citeauthor{hi05}. The grid sizes were chosen to be as close as possible to their Penrose counterparts, with the S grid containing 676 cells, the M grid containing 1,937 cells, the L grid containing 5,184 cells, and the XL grid containing 13,924 cells.
+}
+\label{fig:hi05_reg_lifetime}
+\end{figure}
+
+We also collected data for Lifetime to Stability and Ash Density graphs for Rhombs as shown in Figure \ref{fig:crh_lifetime_density}. The lifetime graph for the Rhomb tiling possesses the same overall right-skewed shape as all the other lifetime graphs we have examined, and outside of a few outliers the ash density plot shows no correlation between lifetime and final ash density either. Again, the final ash densities fall within a range of $d=0$ to $d=0.03$ like the Kite/Dart tilings. However, the overall average lifetime for the Rhomb tiling is higher than the lifetimes for the Kite/Dart tiling (Figure \ref{fig:both_lifetime}); we speculate that this is due to the convexity of the Rhomb tiles which allow for larger neighborhood sizes which then allow more opportunities for ON cells to proliferate. We will examine neighborhood differences in more detail in Section \ref{sec:ch4_neighbors}.
+
 \begin{figure}[htp]
 \centering
 \begin{subfigure}[t]{0.6\textwidth}
@@ -675,22 +687,83 @@ Lifetime to Stability and Ash Density graphs for Kites/Darts and Rhombs are pict
 \label{fig:crh_lifetime_density}
 \end{figure}
 
-
-
 \begin{figure}[htp]
 \centering
 \includegraphics[width=0.6\textwidth]{ch4_figs/both_lifetime}
 \caption[Kite/Dart and Rhomb Lifetime Graph]{
-	TODO
+	Lifetime graphs for both our circular Kite/Dart and Rhomb tilings. Note the same overall right-skewed distribution for both graphs.
 }
 \label{fig:both_lifetime}
 \end{figure}
 
 
 \section{Single Run Analysis}
+TODO what to do about sequence of pictures?
+
+The longest run we observed in our Kite/Dart simulations began with an initial soup density of $d=0.22$ and had an active lifetime of 173 timesteps before periodic behavior set in. We graph the active density of ON cells in the tiling against time in Figure \ref{fig:ckd_single}. As seen in this graph, the active density of the Penrose quickly falls to near typical ash density levels ($d \approx 0.03$) and stays close to constant over a majority of its lifetime. We hypothesize that this behavior would be indicative of ash stabilizing relatively quickly with a small glider-like structure being primarily responsible for the long lifetime. Looking at the actual simulation, this seems to be the case, with an amorphous moving structure propagating in the upper left corner for majority of the simulation as seen in Figure TODO. Otherwise, the ash settles relatively quickly, with a \textit{plinker} (coined by \citeauthor{hi05}) p2 oscillator present on the right side of the tiling.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.6\textwidth]{ch4_figs/ckd_173_density_lifetime}
+\caption[Kite/Dart Single Run Density Graph]{
+	Active density plotted against time for an initial soup density of $d=0.22$ on our circular Kite/Dart tiling. The lifetime of the run was 173 timesteps, with a final ash density of $d=0.0190$.
+}
+\label{fig:ckd_single}
+\end{figure}
+
+The longest run observed in our Rhomb simulations began with an initial soup density of $d=0.26$ had an active lifetime of 666 timesteps. Its density is plotted against time in Figure \ref{fig:crh_single}. Unlike the Kite/Dart single run, there are some fluctuations in the active density of ON cells in the grid throughout the run. Upon visual inspection of the run (seen in Figure TODO), there is spreading activation across the grid when moving structures collide with stable structures or oscillators, resulting in the spikes in density such as the one beginning around timestep 200.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.6\textwidth]{ch4_figs/crh_666_density_lifetime}
+\caption[Rhomb Single Run Density Graph]{
+	Active density plotted against time for an initial soup density of $d=0.26$ on our circular Rhomb tiling. The lifetime of the run was 666 timesteps, with a final ash density of $d=0.0279$.
+}
+\label{fig:crh_single}
+\end{figure}
+
+In either run, the most coherent structures are oscillators; ``glider-like'' objects struggle to emerge and move across the grid, with most movement occurring haphazardly across the tilings with no well-defined direction or structural boundaries like standard Game of Life gliders. This was expected due to the aperiodic nature of Penrose tilings, with structural coherency only possible within localized regions of the tiling as neighborhood size and structure will vary across the grid. With the experiments and data collected thus far, it appears that effective information transfer will be difficult to achieve within Penrose Life of either tiling.
 
 \section{Neighborhood Analysis}
+\label{sec:ch4_neighbors}
 
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.6\textwidth]{ch4_figs/both_neighborhood_Size}
+\label{fig:both_neighborhood}
+\caption[Kite/Dart and Rhomb Neighborhood Size Frequency]{
+	TODO
+}
+\end{figure}
+
+\begin{figure}[htp]
+\centering
+\begin{subfigure}[t]{0.6\textwidth}
+	\centering
+	\includegraphics[width=\textwidth]{ch4_figs/ow08_fig18_kd_nbd}
+	\caption{Generalized Moore Neighborhood for Kites/Darts}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.6\textwidth}
+	\centering
+	\includegraphics[width=\textwidth]{ch4_figs/ow08_fig20_rh_nbd}
+	\caption{Generalized Moore Neighborhood for Rhombs}
+\end{subfigure}
+
+\caption[Generalized Moore Neighborhoods for Kites/Darts and Rhombs]{
+	TODO~\cite{ow08}
+}
+\label{fig:ow08_nbd_stencils}
+\end{figure}
+
+\iffalse
+\begin{tabular}{ l | l }
+\hline
+Kite/Dart & Rhomb \\
+\hline
+8.360 & 8.824
+\end{tabular}
+\fi
 \section{Tiling Size Comparison}
 
 \section{Subregion Analysis}
@@ -706,7 +779,7 @@ Lifetime to Stability and Ash Density graphs for Kites/Darts and Rhombs are pict
 \item Subregion Lifetime analysis
 \end{itemize}
 
-\section{Penrose Gliders?}
+\section{Potential for Penrose Gliders}
 
 TODOs
 \begin{itemize}
@@ -746,6 +819,7 @@ The goal is to investigate the impact of temporal noise on task-performing cellu
 
 \item majority task experiments beyond local majority
 \item adaptation of $\gamma$ parameter to irregular 2D grids
+\item attractor basin work
 
 \end{itemize}
 
