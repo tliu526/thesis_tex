@@ -148,6 +148,7 @@ We will begin with a formal definition of a cellular automaton~\cite{la90}. A CA
 \item Class III: Most initial configurations degenerate to chaotic, unpredictable behavior.
 \item Class IV: Some initial configurations result in complex localized structures that have the potential to be long-lived.
 \end{itemize}
+
 \citeauthor{li90b} later expands to six categories, with Class I and Class II both split into more specific subclasses. Though these are broad, rough categorizations, we expect Class IV to be the category of interest when examining potential capacity for computation in cellular automata.
 
 \medskip
@@ -698,7 +699,10 @@ We also collected data for Lifetime to Stability and Ash Density graphs for Rhom
 
 
 \section{Single Run Analysis}
-TODO what to do about sequence of pictures?
+\label{sec:ch4_single_run}
+%TODO what to do about sequence of pictures?
+
+TODO: Circ Kite/Dart longest run: initial percentage=28, seed=92, lifetime=169
 
 The longest run we observed in our Kite/Dart simulations began with an initial soup density of $d=0.22$ and had an active lifetime of 173 timesteps before periodic behavior set in. We graph the active density of ON cells in the tiling against time in Figure \ref{fig:ckd_single}. As seen in this graph, the active density of the Penrose quickly falls to near typical ash density levels ($d \approx 0.03$) and stays close to constant over a majority of its lifetime. We hypothesize that this behavior would be indicative of ash stabilizing relatively quickly with a small glider-like structure being primarily responsible for the long lifetime. Looking at the actual simulation, this seems to be the case, with an amorphous moving structure propagating in the upper left corner for majority of the simulation as seen in Figure TODO. Otherwise, the ash settles relatively quickly, with a \textit{plinker} (coined by \citeauthor{hi05}) p2 oscillator present on the right side of the tiling.
 
@@ -727,14 +731,7 @@ In either run, the most coherent structures are oscillators; ``glider-like'' obj
 \section{Neighborhood Analysis}
 \label{sec:ch4_neighbors}
 
-\begin{figure}[htp]
-\centering
-\includegraphics[width=0.6\textwidth]{ch4_figs/both_neighborhood_Size}
-\label{fig:both_neighborhood}
-\caption[Kite/Dart and Rhomb Neighborhood Size Frequency]{
-	TODO
-}
-\end{figure}
+We see a significant difference between the average lifetimes of the Kite/Dart and Rhomb tilings, primarily due to differing local neighborhood characteristics. The possible neighborhood configurations for both tilings are pictured in Figure~\ref{fig:ow08_nbd_stencils}. We see that Rhomb tilings have many stencil configurations with a neighborhood size of ten or greater, while the Kite/Dart tilings only have one such stencil configuration. This is likely to give Rhomb tilings higher average neighborhood sizes across an entire tiling. Neighborhood size frequencies for our circular tilings are pictured in Figure~\ref{fig:both_neighborhood}. The most frequent neighborhood size for our Kite/Dart tiling is 9, whereas the most frequent neighborhood size for our Rhomb tiling is 10. The average neighborhood size is indeed higher for Rhombs than it is for Kite/Darts, as shown in Table~\ref{tbl:avg_nbd}. This data suggests that increased connectivity would allow for longer lifetimes, as there would be more opportunities for birth. Also note that both tilings have a higher neighborhood size than regular square grids, which have a neighborhood size of 8. Thus we cannot solely rely on connectivity when evaluating a grid's ability to support Life or other complex behavior. 
 
 \begin{figure}[htp]
 \centering
@@ -751,22 +748,110 @@ In either run, the most coherent structures are oscillators; ``glider-like'' obj
 \end{subfigure}
 
 \caption[Generalized Moore Neighborhoods for Kites/Darts and Rhombs]{
-	TODO~\cite{ow08}
+	All generalized Moore neighborhood stencils for both Kites/Darts and Rhombs. The size of the neighborhood is shown in bold. Figure adapted from 
+	\citeauthor{ow08}~\cite{ow08}.
 }
 \label{fig:ow08_nbd_stencils}
 \end{figure}
 
-\iffalse
-\begin{tabular}{ l | l }
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.6\textwidth]{ch4_figs/both_neighborhood_size}
+\caption[Kite/Dart and Rhomb Neighborhood Size Frequency]{
+	A histogram of neighborhood size frequency for both our Kite/Dart and Rhomb grid. Note that neighborhood sizes of less than 8 for Kites/Darts and less than 7 for Rhombs belong to border tiles with incomplete neighborhoods.
+}
+\label{fig:both_neighborhood}
+\end{figure}
+
+Because tiles on the boundary have incomplete neighborhoods, we may get differing behavior at the border of the tiling that may impact lifetime or ash density. To investigate potential impact of border tiles, we recorded the neighborhood frequency for the Rhomb single run discussed in Section~\ref{sec:ch4_single_run}, pictured in Figure~\ref{fig:crh_single_nbd}. Neighborhood sizes of 6 or less only occur at the boundaries, making them incomplete neighborhoods for the Rhomb tiling. Since we do see some activity throughout the lifetime of the simulation at these border cells, we need to consider ways to examine boundary effects. One option we explore in the following section is to place an initial starting configuration within a subregion of a larger graph and then only consider activity in the subregion.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.6\textwidth]{ch4_figs/crh_666_neighbor_on_percent}
+\caption[Rhomb Single Run Neighborhood ON Percentage]{
+	A chart of the ON percentage of neighborhood sizes. We record the number of ON cells with a particular neighborhood size and divide by the total number of cells with that neighborhood size for each timestep, averaging across all timesteps.
+}
+\label{fig:crh_single_nbd}
+\end{figure}
+
+\begin{figure}[htp]
+\centering
+\begin{tabular}{| l | l |}
 \hline
 Kite/Dart & Rhomb \\
 \hline
-8.360 & 8.824
+8.360 & 8.824 \\
+\hline
 \end{tabular}
-\fi
-\section{Tiling Size Comparison}
+\caption[Kite/Dart and Rhomb Average Neighborhood Size]{
+1	Kite/Dart and Rhomb Average Neighborhood Size
+}
+\label{tbl:avg_nbd}
+\end{figure}
 
 \section{Subregion Analysis}
+
+As shown by \citeauthor{hi05} in Figure~\ref{fig:hi05_lifetime_density}, the size of the grid impacts the average lifetime. In order to investigate both border and size effects on the lifetime of Penrose Life, we ran ``subregioned'' experiments.
+
+\subsection*{Experimental Setup}
+We generated much larger circular Kite/Dart (6484 tiles) and Rhomb (7007 tiles) tilings, but only initialized a subregion of the tiling (Figure~\ref{fig:crhx_sub_init}). The subregion radius is chosen to match the smaller grid we have previously analyzed as close as possible with the idea of replicating the original starting configurations of our first set of lifetime experiments but providing more grid space and removing boundary cell effects. Lifetime to Stability and Ash Density are calculated in the same manner with the same number of trials as before (100 different initial configurations for each initial soup density $d=0.01...0.99$ for 9900 trials). Ash density is only measured within the subregion.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.6\textwidth]{ch4_figs/crhx_subregion}
+\caption[Rhomb Subregion Initialization]{
+	An illustration of subregion initialization for our large Kite/Dart tiling (6484 tiles). The initial soup density within the subregion is $d=0.09$.
+}
+\label{fig:crhx_sub_init}
+\end{figure}
+
+\subsection*{Results}
+The Lifetime to Stability graph comparing our initial Kite/Dart tiling to the larger subregioned tiling is shown in Figure~\ref{fig:ckd_small_large_lifetime}. There is not a significant increase in lifetime at the peak initial soup densities, though the larger grid appears to have less of a fall-off of average lifetime at higher initial densities. The analogous graph for Rhomb tilings is shown in Figure~\ref{fig:crh_small_large_lifetime}. For Rhombs, we do see a large increase in lifetimes across all densities. The differences between Kite/Darts and Rhombs in average lifetimes for large tilings could be due to the relative increased connectivity of the large Rhomb tilings when there are no boundaries present: if we take the weighted average of incomplete neighborhood sizes for both Kite/Darts and Thin/Thick Rhombs as shown in Figure~\ref{fig:both_neighborhood}, the Kite/Dart average incomplete neighborhood size (6.27) is higher than the Rhomb incomplete neighborhood size (5.12). Coupled with the fact Rhomb tilings have a larger average neighborhood size (Figure~\ref{tbl:avg_nbd}), the ``removal'' of boundaries from the subregioned tilings would produce a more dramatic change in neighborhood sizes for the Rhomb tiling in comparison to the Kite/Dart tiling. Of course, this difference could potentially be due to other factors, such as the geometric or spatial orientation of the two different types of Penrose tilings.
+
+%6.27
+%5.12
+
+\begin{figure}[htp]
+\centering
+	\begin{subfigure}[t]{0.6\textwidth}
+	\includegraphics[width=\textwidth]{ch4_figs/ckd_small_large_lifetime}
+	\caption{Kite/Dart Small/Large Lifetime Graph}
+	\label{fig:ckd_small_large_lifetime}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.6\textwidth}
+	\centering
+	\includegraphics[width=\textwidth]{ch4_figs/crh_small_large_lifetime}
+	\caption{Rhomb Small/Large Lifetime Graph}
+	\label{fig:crh_small_large_lifetime}
+	\end{subfigure}
+\caption[Small/Large Lifetime Graphs]{
+	Average Lifetime plotted against Initial Density for both our small Penrose tilings and our large subregion Penrose tilings.
+	}
+\end{figure}
+
+Ash Density analysis TODO
+
+\begin{figure}[htp]
+\centering
+	\begin{subfigure}[t]{0.6\textwidth}
+	\includegraphics[width=\textwidth]{ch4_figs/ckdx_sub_ash_density}
+	\caption{Kite/Dart Subregion Ash Density Scatter Plot}
+	\label{fig:ckd_sub_ash_density}
+	\end{subfigure}
+~
+	\begin{subfigure}[t]{0.6\textwidth}
+	\centering
+	\includegraphics[width=\textwidth]{ch4_figs/crhx_sub_ash_density}
+	\caption{Rhomb Subregion Ash Density Scatter Plot}
+	\label{fig:crh_sub_ash_density}
+	\end{subfigure}
+\caption[Subregion Ash Density Plots]{
+	TODO
+	}
+\end{figure}
+
+
 
 \begin{itemize}
 \item lifetime to stability/ash density against lifetime replication
