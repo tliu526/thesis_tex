@@ -441,6 +441,7 @@ In this section we'll describe the algorithms utilized to generate the various g
 \subsection{Penrose Tilings}
 To generate Penrose Tilings and Penrose-connected graphs, we use inflation processes to recursively generate the tiling. \citeauthor{ro71}'s triangle recursive decomposition technique is utilized to draw both kite/dart and thin/thick rhomb tilings, except full tiles are drawn instead of individual triangles~\cite{ro71}. Though drawing full tiles will likely result in tiles being considered and drawn multiple times, we avoid this by marking faces as they are drawn, only keeping a single copy of each face. As in all our grid generation programs, we track geometric primitives (\texttt{Point}, \texttt{Edge}, \texttt{Face}) to make generating our standard grid input file straightforward.
 
+TODO more detail?
 
 \subsection{Delaunay Triangulations and Voronoi Diagrams}
 The goal with building grids using Voronoi diagrams is to produce irregular grids that still respect Euclidean distance, as discussed in Section \ref{subsec:ModelVoronoiRep}. Given a set of \textit{generator points} $\{p_1, ..., p_n\}$ in the plane, a Voronoi polygon $V_k$ corresponding to a generator point $p_k$ consists of all points whose distance to $p_k$ is less than its distance to any other generator point. Thus, we can partition the plane into Voronoi polygons that correspond to every generator point, producing a \textit{Voronoi Diagram}. These polygons will serve as the cells in our CA simulations. 
@@ -503,7 +504,7 @@ As noted in Section \ref{subsec:vquad}, VQuad grid generation is dependent on th
 \centering
 \includegraphics[width=1.0\textwidth]{ch3_figs/gen_pt_degen_7}
 \caption[Generator Point Degradation]{
-  A VQuad grid degraded by the removal of 7\% of the input generator points. Notice the lack of small, (particularly single cell) ``holes'' in the resulting grid.
+  A VQuad grid degraded by the removal of 7\% of the input generator points. Notice the lack of small, (particularly single cell) holes in the resulting grid.
 }
 \label{fig:genpt_degen}
 \end{figure}
@@ -514,9 +515,9 @@ Though generator point removal provides a simple way to degrade a grid, we wante
 \begin{figure}[htp]
 \centering
 %TODO add crosshatch degeneration figure
-%\includegraphics[width=1.0\textwidth]{gen_pt_degen_7}
+\includegraphics[width=1.0\textwidth]{ch3_figs/ch_p100_w20}
 \caption[Crosshatching Degeneration]{
-	Crosshatching Degeneration TODO
+	An illustration of a $p=1.0$, $w=20$ crosshatch degenerated grid: edges marked in red are not part of the connectivity graph.
 }
 \label{fig:crosshatch_degen}
 \end{figure}
@@ -541,7 +542,7 @@ In the $\lambda$ experiments performed by \citeauthor{wo90}, rule tables must be
 %TODO reword last sentence
 
 
-\section{Summary?}
+\section{Summary}
 
 \processdelayedfloats
 
@@ -615,8 +616,7 @@ In order to locate where interesting behavior may occur in Penrose Life, we begi
 Both Kite/Dart and Thin/Thick Rhomb Penrose tilings are considered. We utilize circular grids, with the Kite/Dart grid containing 995 cells and Rhomb grid containing 1,075 cells. The Rule Table utilizes standard Game of Life rules with generalized Moore neighborhood stencils (Figure TODO). For each initial soup density we run 100 trials and average our statistics across all the trials, resulting in 9,900 CA simulations which. The tilings are pictured in Figure \ref{fig:penrose_circ}.
 
 \subsection{Results}
-Lifetime to Stability and Ash Density graphs for Kites/Darts are pictured in Figure \ref{fig:ckd_lifetime_density}. These results agree with the data presented by \citeauthor{hi05} shown in Figure \ref{fig:hi05_lifetime_density}, with our circular tiling falling in between the S and M grids in terms of size: both lifetime graphs have a right-skewed distribution while the ash density plots show little correlation between lifetime and final ash density for initial soup densities of $d=0.20, 0.40, 0.60$. The ash densities fall within a range of about $d=0.00$ to $d=0.03$. It's important to note that the lifetime graphs have the same distribution shape as the standard Game of Life lifetime graph, though the average lifetimes for the Penrose tilings are much lower than the standard grid (Figure \ref{fig:hi05_reg_lifetime}). %TODO moar analysis here?
-This suggests that the overall qualitative behavior of Penrose Life could be similar to the standard Game of Life but also shows that it is much more difficult to maintain coherent Life structures on irregular grids.
+Lifetime to Stability and Ash Density graphs for Kites/Darts are pictured in Figure \ref{fig:ckd_lifetime_density}. These results agree with the data presented by \citeauthor{hi05} shown in Figure \ref{fig:hi05_lifetime_density}, with our circular tiling falling in between the S and M grids in terms of size: both lifetime graphs have a right-skewed distribution while the ash density plots show little correlation between lifetime and final ash density for initial soup densities of $d=0.20, 0.40, 0.60$. The ash densities fall within a range of about $d=0.00$ to $d=0.03$. It's important to note that though the lifetime graphs have the same distribution shape as the standard Game of Life lifetime graph, the average lifetimes for the Penrose tilings are much lower than the standard grid (Figure \ref{fig:hi05_reg_lifetime}). Similarly, though the ash density plots for the standard grid show no correlation between lifetime and ash density like the Kite/Dart plot (Figure \ref{fig:hi05_reg_density}), the final ash densities fall in a higher range of about $d=0.02$ to $d=0.06$. These results suggests that the overall qualitative behavior of Penrose Life could be similar to the standard Game of Life but also shows that it is much more difficult to maintain coherent Life structures on irregular grids.
 
 \begin{figure}[htp]
 \centering
@@ -659,11 +659,24 @@ This suggests that the overall qualitative behavior of Penrose Life could be sim
 
 \begin{figure}[htp]
 \centering
-\includegraphics[width=0.6\textwidth]{ch4_figs/hi05_fig6_lifetime}
-\caption[\citeauthor{hi05}'s Standard GoL Lifetime Graph]{
-	The Lifetime to Stability graph for standard grids produced by \citeauthor{hi05}. The grid sizes were chosen to be as close as possible to their Penrose counterparts, with the S grid containing 676 cells, the M grid containing 1,937 cells, the L grid containing 5,184 cells, and the XL grid containing 13,924 cells.
+\begin{subfigure}[t]{0.6\textwidth}
+	\centering
+	\includegraphics[width=\textwidth]{ch4_figs/hi05_fig6_lifetime}
+	\caption{Standard GoL Lifetime to Stability Graph: x-axis = Initial Percentage of ON states, y-axis = Average Lifetime to Stability}
+	\label{fig:hi05_reg_lifetime}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.6\textwidth}
+	\centering
+	\includegraphics[width=\textwidth]{ch4_figs/hi05_fig8_reg_ash_density}
+	\caption{Standard GoL Ash Density Scatter Plot: x-axis = Ash Density, y-axis = Lifetime to Stability}
+	\label{fig:hi05_reg_density}
+\end{subfigure}
+
+\caption[\citeauthor{hi05}'s Standard GoL Lifetime and Ash Density Graphs]{
+	The Lifetime to Stability graph for standard grids produced by \citeauthor{hi05}. The grid sizes were chosen to be as close as possible to their Penrose counterparts, with the S grid containing 676 cells, the M grid containing 1,937 cells, the L grid containing 5,184 cells, and the XL grid containing 13,924 cells. The data points pictured in Figure (b) are from the M grid~\cite{hi05}.
 }
-\label{fig:hi05_reg_lifetime}
+
 \end{figure}
 
 We also collected data for Lifetime to Stability and Ash Density graphs for Rhombs as shown in Figure \ref{fig:crh_lifetime_density}. The lifetime graph for the Rhomb tiling possesses the same overall right-skewed shape as all the other lifetime graphs we have examined, and outside of a few outliers the ash density plot shows no correlation between lifetime and final ash density either. Again, the final ash densities fall within a range of $d=0$ to $d=0.03$ like the Kite/Dart tilings. However, the overall average lifetime for the Rhomb tiling is higher than the lifetimes for the Kite/Dart tiling (Figure \ref{fig:both_lifetime}); we speculate that this is due to the convexity of the Rhomb tiles which allow for larger neighborhood sizes which then allow more opportunities for ON cells to proliferate. We will examine neighborhood differences in more detail in Section \ref{sec:ch4_neighbors}.
@@ -702,9 +715,9 @@ We also collected data for Lifetime to Stability and Ash Density graphs for Rhom
 \label{sec:ch4_single_run}
 %TODO what to do about sequence of pictures?
 
-TODO: Circ Kite/Dart longest run: initial percentage=28, seed=92, lifetime=169
+%TODO: Circ Kite/Dart longest run: initial percentage=28, seed=92, lifetime=169
 
-The longest run we observed in our Kite/Dart simulations began with an initial soup density of $d=0.22$ and had an active lifetime of 173 timesteps before periodic behavior set in. We graph the active density of ON cells in the tiling against time in Figure \ref{fig:ckd_single}. As seen in this graph, the active density of the Penrose quickly falls to near typical ash density levels ($d \approx 0.03$) and stays close to constant over a majority of its lifetime. We hypothesize that this behavior would be indicative of ash stabilizing relatively quickly with a small glider-like structure being primarily responsible for the long lifetime. Looking at the actual simulation, this seems to be the case, with an amorphous moving structure propagating in the upper left corner for majority of the simulation as seen in Figure TODO. Otherwise, the ash settles relatively quickly, with a \textit{plinker} (coined by \citeauthor{hi05}) p2 oscillator present on the right side of the tiling.
+The longest run we observed in our Kite/Dart simulations began with an initial soup density of $d=0.22$ and had an active lifetime of 173 timesteps before periodic behavior set in. We graph the active density of ON cells in the tiling against time in Figure \ref{fig:ckd_single}. As seen in this graph, the active density of the Penrose quickly falls to near typical ash density levels ($d \approx 0.03$) and stays close to constant over a majority of its lifetime. We hypothesize that this behavior would be indicative of ash stabilizing relatively quickly with a small glider-like structure being primarily responsible for the long lifetime. Looking at the actual simulation, this seems to be the case, with an amorphous moving structure propagating in the upper left corner for majority of the simulation as seen in Figure TODO. Otherwise, the ash settles relatively quickly, with a \textit{plinker} (coined by \citeauthor{hi05}) period 2 oscillator present on the right side of the tiling.
 
 \begin{figure}[htp]
 \centering
@@ -748,7 +761,7 @@ We see a significant difference between the average lifetimes of the Kite/Dart a
 \end{subfigure}
 
 \caption[Generalized Moore Neighborhoods for Kites/Darts and Rhombs]{
-	All generalized Moore neighborhood stencils for both Kites/Darts and Rhombs. The size of the neighborhood is shown in bold. Figure adapted from 
+	All generalized Moore neighborhood stencils for both Kites/Darts and Rhombs. The size of the neighborhood is shown in bold. Figures adapted from 
 	\citeauthor{ow08}~\cite{ow08}.
 }
 \label{fig:ow08_nbd_stencils}
@@ -791,7 +804,7 @@ Kite/Dart & Rhomb \\
 
 \section{Subregion Analysis}
 
-As shown by \citeauthor{hi05} in Figure~\ref{fig:hi05_lifetime_density}, the size of the grid impacts the average lifetime. In order to investigate both border and size effects on the lifetime of Penrose Life, we ran ``subregioned'' experiments.
+As shown by \citeauthor{hi05} in Figure~\ref{fig:hi05_lifetime_density}, the size of the grid impacts the average lifetime. In order to investigate both border and size effects on the lifetime of Penrose Life, we ran \textit{subregion} experiments.
 
 \subsection*{Experimental Setup}
 We generated much larger circular Kite/Dart (6484 tiles) and Rhomb (7007 tiles) tilings, but only initialized a subregion of the tiling (Figure~\ref{fig:crhx_sub_init}). The subregion radius is chosen to match the smaller grid we have previously analyzed as close as possible with the idea of replicating the original starting configurations of our first set of lifetime experiments but providing more grid space and removing boundary cell effects. Lifetime to Stability and Ash Density are calculated in the same manner with the same number of trials as before (100 different initial configurations for each initial soup density $d=0.01...0.99$ for 9900 trials). Ash density is only measured within the subregion.
@@ -806,7 +819,7 @@ We generated much larger circular Kite/Dart (6484 tiles) and Rhomb (7007 tiles) 
 \end{figure}
 
 \subsection*{Results}
-The Lifetime to Stability graph comparing our initial Kite/Dart tiling to the larger subregioned tiling is shown in Figure~\ref{fig:ckd_small_large_lifetime}. There is not a significant increase in lifetime at the peak initial soup densities, though the larger grid appears to have less of a fall-off of average lifetime at higher initial densities. The analogous graph for Rhomb tilings is shown in Figure~\ref{fig:crh_small_large_lifetime}. For Rhombs, we do see a large increase in lifetimes across all densities. The differences between Kite/Darts and Rhombs in average lifetimes for large tilings could be due to the relative increased connectivity of the large Rhomb tilings when there are no boundaries present: if we take the weighted average of incomplete neighborhood sizes for both Kite/Darts and Thin/Thick Rhombs as shown in Figure~\ref{fig:both_neighborhood}, the Kite/Dart average incomplete neighborhood size (6.27) is higher than the Rhomb incomplete neighborhood size (5.12). Coupled with the fact Rhomb tilings have a larger average neighborhood size (Figure~\ref{tbl:avg_nbd}), the ``removal'' of boundaries from the subregioned tilings would produce a more dramatic change in neighborhood sizes for the Rhomb tiling in comparison to the Kite/Dart tiling. Of course, this difference could potentially be due to other factors, such as the geometric or spatial orientation of the two different types of Penrose tilings.
+The Lifetime to Stability graph comparing our initial Kite/Dart tiling to the larger subregioned tiling is shown in Figure~\ref{fig:ckd_small_large_lifetime}. There is not a significant increase in lifetime at the peak initial soup densities, though the larger grid appears to have less of a fall-off of average lifetime at higher initial densities. The analogous graph for Rhomb tilings is shown in Figure~\ref{fig:crh_small_large_lifetime}. For Rhombs, we do see a large increase in lifetimes across all densities. The differences between Kite/Darts and Rhombs in average lifetimes for large tilings could be due to the relative increased connectivity of the large Rhomb tilings when there are no boundaries present: if we take the weighted average of incomplete neighborhood sizes for both Kite/Darts and Rhombs as shown in Figure~\ref{fig:both_neighborhood}, the Kite/Dart average incomplete neighborhood size (6.27) is higher than the Rhomb incomplete neighborhood size (5.12). Coupled with the fact Rhomb tilings have a larger average neighborhood size (Figure~\ref{tbl:avg_nbd}), the ``removal'' of boundaries from the subregioned tilings would produce a more dramatic change in neighborhood sizes for the Rhomb tiling in comparison to the Kite/Dart tiling. This difference could also potentially be due to other factors, such as the geometric or spatial orientation of the two different types of Penrose tilings.
 
 %6.27
 %5.12
@@ -830,7 +843,8 @@ The Lifetime to Stability graph comparing our initial Kite/Dart tiling to the la
 	}
 \end{figure}
 
-Ash Density analysis TODO
+Ash density scatter plots for our subregion Kite/Dart and Rhomb tilings are pictured in Figure~\ref{fig:ckd_sub_ash_density} and Figure~\ref{fig:crh_sub_ash_density}. Note that the ash density values are only measured within the subregion of initialization; ash in the outer regions of the tiling are not included in the density calculation. We see again that there is no correlation between lifetime and ash density as shown by both plots, and the ash densities fall roughly the same ranges we have seen before. In Figure~\ref{fig:crh_sub_ash_density} there are a number of simulations that have a final ash density of zero for Rhomb tilings. This could be due to moving structures that travel outside the subregion, which makes sense as the average lifetime for Rhomb tilings is also much higher than the average lifetime for Kite/Dart tilings. These subregion experiments illustrate that Rhomb tilings may have fundamental properties  different from the Kite/Dart tilings beyond neighborhood size that allow for long-lived Penrose Life runs. 
+%Overall however, it appears that ``removing'' the boundary from the Penrose tilings does not significantly alter the quantitative behavior of either type of tiling.
 
 \begin{figure}[htp]
 \centering
@@ -847,31 +861,30 @@ Ash Density analysis TODO
 	\label{fig:crh_sub_ash_density}
 	\end{subfigure}
 \caption[Subregion Ash Density Plots]{
-	TODO
+	Ash Density scatter plots for both Kite/Dart and Rhomb subregion tiling. Ash density is only measured from within the initialization subregion.
 	}
 \end{figure}
 
-
-
-\begin{itemize}
-\item lifetime to stability/ash density against lifetime replication
-\item Long Single Penrose Life Run
-\item Comparison between Kite/Darts and Rhomb Penrose Grids
-\item Neighborhood analysis
-
-\item Grid Size Comparison
-
-\item Subregion Lifetime analysis
-\end{itemize}
-
 \section{Potential for Penrose Gliders}
+With the ash density results shown for subregion Rhomb tilings along with the significantly higher average lifetime for Rhomb tilings in general, there is some potential for gliders to be found in Penrose Rhomb Life. Unfortunately, like \citeauthor{ow10} who also searched for gliders in Penrose tilings~\cite{ow10}, the only coherent structures we have detected in either tiling are oscillators. It appears that the aperiodic nature of the Penrose tilings severely limits the ability for coherent structures to travel beyond a particular localized region within Penrose Life. 
 
-TODOs
+However, if we move away from the Game of Life rules, there is potential for coherent moving structures to exist on Penrose tilings. \citeauthor{go12} created a 4-state CA rule table that supports a coherent glider structure on both Kite/Dart and Rhomb tilings (Figure TODO)~\cite{go12}. This discovery illustrates that aperiodicity does not completely limit the ability for a CA to transfer information across a grid space; in fact it has been conjectured that a CA rule table can be created for \textit{any} quadrilateral tiling, provided that the CA has enough possible states~\cite{mu16}. Further analysis of \citeauthor{go12}'s CA rule table will be conducted in Chapter~\ref{ch:lambda_degen}.
+
+\iffalse
+TODO
 \begin{itemize}
-\item run lambda experiments for K=3, N=11 grids? (Penrose glider)
+\item run lambda experiments for K=4, N=11 grids? (Penrose glider)
 \end{itemize}
+\fi
+
+\section{Summary}
+We have conducted various tests examining the behavior of the Game of Life on aperiodic Penrose tilings. By replicating and extending the work of \citeauthor{hi05} to both Kite/Dart and Rhomb tilings, we have shown that though Penrose Life has some similar qualitative properties to the standard Game of Life, there are significant differences in terms of lifetime and ash density between the two CAs. We see that the aperiodicity of the Penrose tilings hampers the ability for information transfer to occur across the grid as the only coherent structures we have detected in our simulations are oscillators. 
+
+Additionally, there appear to be some quantitative differences between the Kite/Dart and Rhomb tiling's ability to support Penrose Life as evidenced by the much higher average lifetimes of simulations on the Rhomb tilings. Possible sources of these differences could be the higher average neighborhood size or the geometric properties (Rhombs are all convex quadrilaterals) of the Rhomb tilings. Boundary conditions and overall grid size also appear to impact a grid's ability to support complex CA behavior. These attributes of irregular grids will be examined further in the following chapters.
 
 \processdelayedfloats
+
+%CHAPTER 5
 
 \chapter{Local Majority Experiments}
 \label{ch:local_maj}
@@ -905,6 +918,7 @@ The goal is to investigate the impact of temporal noise on task-performing cellu
 \item majority task experiments beyond local majority
 \item adaptation of $\gamma$ parameter to irregular 2D grids
 \item attractor basin work
+\item power law work
 
 \end{itemize}
 
@@ -996,7 +1010,7 @@ Then, assuming that the other seven states appear equally often in the transitio
 H = -\left[ v \log v + 7\left(\frac{1-v}{7}\right)\log\left(\frac{1-v}{7}\right)\right]
 \end{equation}
 
-This estimate for entropy is plotted below in Figure \ref{fig:mft_lambda}.
+This estimate for entropy is plotted in Figure \ref{fig:mft_lambda}.
 
 \begin{figure}[htp]
 \centering
@@ -1007,7 +1021,7 @@ This estimate for entropy is plotted below in Figure \ref{fig:mft_lambda}.
 \label{fig:mft_lambda}
 \end{figure}
 \processdelayedfloats
-\chapter{Miscellaneous}
+\chapter{Supplementary Figures and Calculations}
 \section{Grid Input File Format}
 \label{appB:grid_in}
 \begin{figure}
@@ -1023,7 +1037,7 @@ This estimate for entropy is plotted below in Figure \ref{fig:mft_lambda}.
 
 \section{Calculating Unique Rotations in a $\lambda$ Transition Table}
 \label{appB:rot}
-TODO
+
 \processdelayedfloats
 \end{appendices}
 
