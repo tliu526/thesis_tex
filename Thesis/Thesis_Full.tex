@@ -7,6 +7,42 @@
 \usepackage{courier}
 \usepackage{subcaption}
 
+%For inserting sequences of images
+%\usepackage{python}
+\usepackage{verbatim}
+\makeatletter
+\newwrite\Code@out
+
+\newcommand\python{\obeylines\expandafter\pythonArg\noexpand}
+
+\newcommand\pythonArg[1][tmp.py.in]{%
+    \gdef\FNameIn{#1}
+    \gdef\FNameOut{tmp.py.out}
+    \begingroup
+        \@bsphack%
+        \immediate\openout\Code@out\FNameIn%
+        \let\do\@makeother\dospecials%
+        \catcode`\^^M\active%
+        \def\verbatim@processline{%
+            \immediate\write\Code@out{\the\verbatim@line}}%
+        \verbatim@start}
+
+\def\endpython{%
+        \immediate\closeout\Code@out\@esphack
+    \endgroup
+
+     %Execute python script. Python directory must be in PATH.
+     \immediate\write18{python \FNameIn > \FNameOut}
+     \input{\FNameOut}
+}
+
+\makeatother
+
+
+%\usepackage{multido}
+
+%\usepackage{subfig}
+
 %For flowcharts
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows}
@@ -312,7 +348,7 @@ First, we review the basic idea of Voronoi diagrams. In order to construct a dia
 \label{fig:voronoi}
 \end{figure}
 
-\citeauthor{fl01} simulate several social dynamics interactions through CA systems ran on both regular grids and Voronoi diagram analogs. The same global behavior was preserved in the Voronoi cases, though the dynamics took a longer time to converge to stabilized behavior relative to the regular grid case~\cite{fl01}. Though only a specific class of computational tasks were tested, the conclusion that these social dynamics tasks are robust to variation in grid structure leads us to the beginning stages of establishing some form of equivalence between classes of irregular and regular grid structures. Additionally, examining the spatial behavior of cells in the Voronoi case revealed some interesting patterns. Because of variations in the local structuring within the Voronoi diagrams, some areas of the irregular grid never participate in computation even when completely surrounded by computing cells, resisting all outside influences (Dead cells figure)~\cite{fl01}. This ``dead cell'' phenomenon provides evidence that the spatial properties inherent in Voronoi diagrams can impact the system's dynamics beyond variations in cell neighborhood connectivity.
+\citeauthor{fl01} simulate several social dynamics interactions through CA systems ran on both regular grids and Voronoi diagram analogs. The same global behavior was preserved in the Voronoi cases, though the dynamics took a longer time to converge to stabilized behavior relative to the regular grid case~\cite{fl01}. Though only a specific class of computational tasks were tested, the conclusion that these social dynamics tasks are robust to variation in grid structure leads us to the beginning stages of establishing some form of equivalence between classes of irregular and regular grid structures. Additionally, examining the spatial behavior of cells in the Voronoi case revealed some interesting patterns. Because of variations in the local structuring within the Voronoi diagrams, some areas of the irregular grid never participate in computation even when completely surrounded by computing cells, resisting all outside influences (Figure~\ref{fig:dead_cells})~\cite{fl01}. This ``dead cell'' phenomenon provides evidence that the spatial properties inherent in Voronoi diagrams can impact the system's dynamics beyond variations in cell neighborhood connectivity.
 Additionally, the potential presence of dead cells along with the randomness produced by generating grids through generator points make Voronoi diagrams an interesting way of introducing variability to a cellular automata as it implicitly encodes some irregular features we have explored in Section \ref{sec:Robust}. However, further work is needed to thoroughly investigate the impact of different spatial representations on the complex behavior and computation in dynamic, decentralized systems. 
 %Thus, one of the main goals of this work is apply the rigorous analysis previously seen (Section \ref{sec:Crit}) concerning emergent computation on spatially diverse systems such as Voronoi-based automata in pursuit of illuminating how natural systems can compute within such noisy environments.
 
@@ -517,7 +553,7 @@ Though generator point removal provides a simple way to degrade a grid, we wante
 %TODO add crosshatch degeneration figure
 \includegraphics[width=1.0\textwidth]{ch3_figs/ch_p100_w20}
 \caption[Crosshatching Degeneration]{
-	An illustration of a $p=1.0$, $w=20$ crosshatch degenerated grid: edges marked in red are not part of the connectivity graph.
+	An illustration of a $p=1.0$, $w=20$ crosshatch degenerated grid: edges marked in red have been removed from the connectivity graph.
 }
 \label{fig:crosshatch_degen}
 \end{figure}
@@ -527,22 +563,47 @@ Though generator point removal provides a simple way to degrade a grid, we wante
 \subsection{Generalized von Neumman and Moore Neighborhoods}
 We would like to maintain a notion of both von Neumman and Moore neighborhoods even on irregular grids. Thus we formally define \textit{generalized} notions of both neighborhood stencils: a \textit{generalized von Neumman neighborhood} for a cell $c$ is defined as all cells that share an edge with $c$, while a \textit{generalized Moore neighborhood} for $c$ is defined as all cells that share a vertex with $c$. These generalized neighborhood definitions are not necessarily equivalent to their standard definitions. For example, while the generalized von Neumman neighborhood for Voronoi Quad grids is identical to the regular case, the generalized Moore neighborhoods are not uniform across the grid and may have neighborhood sizes ranging from 6 to 12. Because we maintain geometry maps in our system, defining either neighborhood stencil is straightforward for any CA simulation on any grid.
 
-\subsection{Life Rule Tables}
-TODO
+\subsection{GoL Rule Tables}
+\label{ch3:subsec_gol}
+Conway's Game of Life (GoL) is a $K=2$, $N=9$ cellular automaton utilizing a Moore neighborhood stencil on regular square lattices~\cite{ga70}. Cells are either ``alive'' or ``dead'', and the rule table has traditionally been described in the following manner:
 
 \begin{itemize}
-\item Traditional Life to Rule Table Representation
-\item Potential for Evaluation based on percentage
+\item Living cells stay alive if 2 or 3 neighbors are alive
+\item Living cells with more than 3 living neighbors die from ``overcrowding''
+\item Living cells with less than 2 living neighbors die from ``loneliness''
+\item Dead cells with exactly 3 living neighbors are ``born''
 \end{itemize}
+
+However, we can also describe the GoL rules in terms of a lookup table: since there are two states, we can map a bit string of length 9 to every possible neighborhood configuration, with each position in the bit string corresponding a particular cell in the Moore neighborhood stencil (Figure~\ref{fig:gol_table}). This manner of encoding allows us to quantify and manipulate a CA's rule table, and we utilize this representation when conducting $\lambda$ experiments as described in the next section.
+
+\begin{figure}[htp]
+\centering
+\begin{tabular}{| l | l |}
+\hline
+Neighborhood & Output \\
+\hline
+00000011\textbf{1} & 1 \\
+\hline
+11000110\textbf{1} & 0 \\
+\hline
+00001000\textbf{1} & 0 \\
+\hline
+00101010\textbf{0} & 1 \\
+\hline
+\end{tabular}
+\caption[Game of Life Rule Table]{
+	A few representative entries in the Game of Life Rule Table (there are $2^9$ entries in total). The center cell is the rightmost bit, in bold. These table entries correspond exactly to the four Game of Life rules as described in Chapter~\ref{ch3:subsec_gol}.
+}
+\label{fig:gol_table}
+\end{figure}
 
 \subsection{$\lambda$ Rule Tables}
 %wolfram command is: rotations with 4 beads, 8 colors
 %TODO Burnside's lemma?
 In the $\lambda$ experiments performed by \citeauthor{wo90}, rule tables must be \textit{isotropic} in that all planar rotations of a particular neighborhood configuration map to the same output cell state; this condition removes the global property of spatial orientation from influencing rule transitions~\cite{av00,wo90}. As a result, what would be a $K^N$ sized table results in a smaller table because only rotationally distinct neighborhood configurations are unique entries: specifically, if we consider the $K=8$, $N=5$ case the rule table of size $8^5 = 32,768$ is reduced to a rule table of size $8,352$ (see Appendix \ref{appB:rot} for calculation). To generate these tables, we iterate over all $K^N$ possible neighborhood values, canonicalize their string representations by finding their \textit{lexicographically minimal rotation}, and track only the unique neighborhoods. For example, in the $K=8, N=5$ case, neighborhoods ``0110'' and ``1001'' map to the same minimal rotation neighborhood of ``0011''. We then append a center state value to the end of this canonical neighborhood representation, thus creating the keys for our $\lambda$ rule table mapping with the output state for that particular neighborhood configuration as the value.
-%TODO reword last sentence
-
 
 \section{Summary}
+We have built a CA simulation system that is modular and extensible. The system performs sufficiently to run a gamut of CA experiments within a reasonable amount of time. The system is also flexible enough so that we can make changes to any portion of the system through implementing various derived classes, and the command line interface allows us to easily tweak experiment parameters without having to change the source code.
 
 \processdelayedfloats
 
@@ -713,7 +774,7 @@ We also collected data for Lifetime to Stability and Ash Density graphs for Rhom
 
 \section{Single Run Analysis}
 \label{sec:ch4_single_run}
-%TODO what to do about sequence of pictures?
+TODO best way to insert sequence of pictures?
 
 %TODO: Circ Kite/Dart longest run: initial percentage=28, seed=92, lifetime=169
 
@@ -807,7 +868,7 @@ Kite/Dart & Rhomb \\
 As shown by \citeauthor{hi05} in Figure~\ref{fig:hi05_lifetime_density}, the size of the grid impacts the average lifetime. In order to investigate both border and size effects on the lifetime of Penrose Life, we ran \textit{subregion} experiments.
 
 \subsection*{Experimental Setup}
-We generated much larger circular Kite/Dart (6484 tiles) and Rhomb (7007 tiles) tilings, but only initialized a subregion of the tiling (Figure~\ref{fig:crhx_sub_init}). The subregion radius is chosen to match the smaller grid we have previously analyzed as close as possible with the idea of replicating the original starting configurations of our first set of lifetime experiments but providing more grid space and removing boundary cell effects. Lifetime to Stability and Ash Density are calculated in the same manner with the same number of trials as before (100 different initial configurations for each initial soup density $d=0.01...0.99$ for 9900 trials). Ash density is only measured within the subregion.
+We generated much larger circular Kite/Dart (6484 tiles) and Rhomb (7007 tiles) tilings, but only initialized a subregion of the tiling (Figure~\ref{fig:crhx_sub_init}). The subregion radius is chosen to match the smaller grid we have previously analyzed as close as possible with the idea of replicating the original starting configurations of our first set of lifetime experiments but providing more grid space and removing boundary cell effects. Lifetime to Stability and Ash Density are calculated in the same manner with the same number of trials as before, with 100 different initial configurations for each initial soup density $d=0.01...0.99$ giving 9900 total trials. Ash density is only measured within the subregion.
 
 \begin{figure}[htp]
 \centering
@@ -889,6 +950,111 @@ Additionally, there appear to be some quantitative differences between the Kite/
 \chapter{Local Majority Experiments}
 \label{ch:local_maj}
 
+As discussed in Chapter~\ref{sec:Robust}, \citeauthor{me07} investigated CA performance on the majority task in the presence of various irregularities. We extend this work by examining the effects of spatial irregularity on CA majority task performance.
+
+\section{Baseline Majority Task Performance on Irregular Grids}
+
+Our extensions of majority task experiments will focus on the \textit{local majority} rule table for 2-state cellular automata. The rules are simple:
+
+\begin{itemize}
+\item If there is a majority of ON or OFF cells in a cell $c$'s neighborhood, then $c$ will transition to the majority state.
+\item If there is no majority, $c$ will retain its previous state.
+\end{itemize}
+
+This rule table represents the most basic manner of solving the majority task and is easily extended to grids with variable neighborhood sizes.
+
+\subsection*{Experimental Setup}
+We mirror \citeauthor{me07}'s experimental setup in order to compare our results with theirs. For regular grids, a 15 by 15 grid (225 total cells) is utilized with periodic boundaries. We begin with a 1:99 ON/OFF ratio, incrementing by 1 percent up to 99:1. The simulation is run for a maximum of 450 time steps, recording only completely correct classification. 1,000 random grid configurations are used for every starting ratio, giivng a total of 99,000 trials. A single complete run takes approximately 25 minutes in our simulation system.
+
+We use Delaunay and Voronoi generation methods to generate our irregular grids. Our experiments utilize both a grid created through Poisson Disk generator points (Figure~\ref{fig:lm_delaunay}) as well as a grid created through a plant stomatal array. For the stomatal array, we begin with an image of the stomata and drop points where the stoma are located. We then utilize these points as generator points for a Delaunay triangulation. The entire process is pictured in Figure~\ref{fig:stoma_graph_gen}.
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.6\textwidth]{ch5_figs/lm_delaunay}
+\caption[Irregular Delaunay Grid for Majority Task]{
+  The Delaunay Triangulation (and thus connectivity graph) for our generated irregular grid. Dimensions for the Poisson Disk sampling were chosen so that the cell count would match the 15 by 15 size of the baseline regular grid as close as possible.
+}
+\label{fig:lm_delaunay}
+\end{figure}
+
+
+\begin{figure}[htp]
+\centering
+  \begin{subfigure}[t]{0.55\textwidth}
+  \includegraphics[width=\textwidth]{ch5_figs/stoma}
+  \caption{Original Stomatal Array Image}
+  \end{subfigure}
+  ~
+  \begin{subfigure}[t]{0.55\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch5_figs/stoma-colored}
+  \caption{Stomatal Array with Stomata Marked}
+  \end{subfigure}
+  ~
+  \begin{subfigure}[t]{0.55\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch5_figs/stoma_graph}
+  \caption{Stomatal Delaunay Triangulation}
+  \end{subfigure}
+\caption[Grid Generation from Stomatal Array]{
+  An illustration of the process we use to generate a grid from a stomatal array image. The final grid pictured is the Delaunay Triangulation of the generator points, which corresponds to the connectivity graph we utilize for the majority task CA.
+  }
+\label{fig:stoma_graph_gen}
+\end{figure}
+
+\subsection*{Results}
+First we replicated \citeauthor{me07}'s baseline experiments to confirm the accuracy of our system, with our results corresponding exactly with theirs (Figure~\ref{fig:me07_baseline_rep}). The general profile of the Local Majority Task performance curve is symmetric, with a severe fall-off in task performance at around ON/OFF ratios of 15:85 and 85:15 and 0\% task performance between ratios of about 30:70 to 70:30. Since the majority classification tasks become increasingly difficult as the ON/OFF ratio approaches 50:50, this degradation in performance is to be expected for such a simple rule. For comparison, the task performance of a more complex rule table created through the use of a \textit{genetic algorithm} is also pictured in Figure~\ref{fig:me07_baseline}. The overall performance of this rule table is much better than the local majority rule, but also sees a drop in performance when classifying 50:50 initial ratios.
+
+\begin{figure}[htp]
+\centering
+  \begin{subfigure}[t]{0.6\textwidth}
+  \includegraphics[width=\textwidth]{ch5_figs/me07_fig2_LMBaseline}
+  \caption{\citeauthor{me07}'s Baseline Local Majority Task Performance Graph}
+  \label{fig:me07_baseline}
+  \end{subfigure}
+  ~
+  \begin{subfigure}[t]{0.6\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch5_figs/lm_baseline_reg_tor}
+  \caption{Replicated Baseline Local Majority Task Performance}
+  \end{subfigure}
+\caption[Replication of \citeauthor{me07}'s Baseline Local Majority Performance]{
+  An illustration of baseline Local Majority task performance on square, periodic 15 by 15 grid. We achieve the same performance graph as \citeauthor{me07}, which is labeled LM in Figure~\ref{fig:me07_baseline}. The performance graph labeled Sip in Figure~\ref{fig:me07_baseline} is from a CA rule table created through the use of a genetic algorithm~\cite{me07}.
+}
+\label{fig:me07_baseline_rep}
+\end{figure}
+
+The task performance of our two irregular grids are pictured in Figure~\ref{fig:lm_ireg}. We see that both irregular grids have the same symmetric task performance profile as the baseline regular grids. This result suggests that irregular grids could be suitable for supporting complex behavior comparable to regular grids. It is also important to note that both irregular grids lack periodic boundary conditions unlike the baseline regular case. The absence of periodicity decreases neighborhood connectivity and will hurt a CA's ability to transfer information across the grid space, making the task performance of the irregular grids even more remarkable. For comparison, local majority task performance for regular grid is reduced significantly when periodic boundary conditions are removed, shown in Figure~\ref{fig:lm_reg_nonper}. Thus, it appears that in the context of the majority task, spatial irregularity will not hinder the performance or behavior of a CA system. The fact that local majority task performance is essentially equivalent across both square and spatially irregular grids establishes a rough form of equivalence between the two grid types within the domain of the CA majority task.
+
+\begin{figure}[htp]
+\centering
+  \begin{subfigure}[t]{0.6\textwidth}
+  \includegraphics[width=\textwidth]{ch5_figs/LM_baseline_vor}
+  \caption{Local Majority Task Performance on a Voronoi Grid}
+  \end{subfigure}
+  ~
+  \begin{subfigure}[t]{0.6\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch5_figs/lm_baseline_stoma}
+  \caption{Local Majority Task Performance on a Stoma Grid}
+  \end{subfigure}
+\caption[Local Majority Task Performance on Irregular Grids]{
+  Task Performance graphs for both our generated irregular grid and the stoma irregular grid. Both have almost identical performance profiles to the baseline Local Majority task performance graph for regular grids.
+}
+\label{fig:lm_ireg}
+\end{figure}
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.6\textwidth]{ch5_figs/lm_baseline_reg_nontor}
+\caption[Local Majority Task Performance on a Non-Periodic Regular Grid]{
+  The task performance graph for a 15 by 15 regular grid with non-periodic boundary conditions. Notice the degradation in task performance in comparison to the performance graphs in Figure~\ref{fig:me07_baseline_rep}.
+}
+\label{fig:lm_reg_nonper}
+\end{figure}
+
+\section{Majority Task Performance with State Noise}
+
 The goal is to investigate the impact of temporal noise on task-performing cellular automata.
 
 \begin{itemize}
@@ -897,6 +1063,10 @@ The goal is to investigate the impact of temporal noise on task-performing cellu
 \item Introduction of Noise
 \end{itemize}
 
+\processdelayedfloats
+
+% CHAPTER 6
+
 \chapter{Lambda Degradation Experiments}
 \label{ch:lambda_degen}
 
@@ -904,10 +1074,9 @@ The goal is to investigate the impact of temporal noise on task-performing cellu
 \item Replication/Setup of Wootter/Langton Experiment
 \item Lambda Profile of Irregular Grids
 \item Lambda Profile of Penrose? (glider lambda?)
-\item Lambda Degeneration (simple)
+\item Lambda Degeneration (simple): TODO run MSE on these graphs
 \item Lambda Degeneration (crosshatching)
 \end{itemize}
-
 
 %TODO move this into individual experiment chapters?
 \chapter{Future Work}
@@ -1024,6 +1193,42 @@ This estimate for entropy is plotted in Figure \ref{fig:mft_lambda}.
 \chapter{Supplementary Figures and Calculations}
 \section{Grid Input File Format}
 \label{appB:grid_in}
+
+\begin{figure}
+\centering
+\begin{tabular}{cccc}
+
+\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}&
+\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_1}}&
+\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_2}}&
+\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_3}}\\
+\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_4}}&
+\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_5}}&
+\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_6}}&
+\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_7}}\\
+
+%1 & 1 & 1 & 1 \\
+\iffalse
+\begin{python}
+print("\\begin{tabular}{cccc}")
+for i in range(0,5):
+	print("1 & 1 & 1 & 1 \\\\")
+  %print("\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}&")
+  %print("\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}&")   
+  %print("\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}&")
+  %print("\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}\\")
+print("\\end{tabular}")
+\end{python}
+\fi
+\end{tabular}
+\caption[Rhomb Single Run Sequence]{
+    Something here
+}
+\label{fig:crh_666_seq}
+
+\end{figure}
+
+
 \begin{figure}
 \centering
 %TODO figure out best way to represent input grid file: straight text or picture?

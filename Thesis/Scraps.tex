@@ -10,3 +10,85 @@ Possible Stencils include considering all cells that share an edge with the cent
 
 \item Subregion Lifetime analysis
 \end{itemize}
+
+
+ 
+        \begin{subfigure}[t]{0.2\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_\i}
+    \end{subfigure} 
+    ~
+    \begin{subfigure}[t]{0.2\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_\i}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.2\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_\i}
+    \end{subfigure}
+    ~
+    \begin{subfigure}[t]{0.2\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_\i}
+    \end{subfigure}
+
+
+\multido{\i=0+1}{66}{%
+\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}&
+\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_1}}&
+\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_2}}&
+\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_3}}\\
+}
+
+
+
+
+\iffalse
+\multido{\i=0+1}{66}{
+    \subcaptionbox{\i}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_\i}}&
+    \subcaptionbox{\i}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_\i}}&
+    \subcaptionbox{\i}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_\i}}&
+    \subcaptionbox{\i}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_\i}}\\
+}
+\fi
+
+\iffalse
+\begin{python}
+
+for i in range(0,5):
+
+    print("\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}&")
+    print("\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}&")   
+    print("\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}&")
+    print("\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}\\")
+\end{python}
+
+
+\makeatletter
+\newwrite\Code@out
+
+\newcommand\python{\obeylines\expandafter\pythonArg\noexpand}
+
+\newcommand\pythonArg[1][tmp.py.in]{%
+    \gdef\FNameIn{#1}
+    \gdef\FNameOut{tmp.py.out}
+    \begingroup
+        \@bsphack%
+        \immediate\openout\Code@out\FNameIn%
+        \let\do\@makeother\dospecials%
+        \catcode`\^^M\active%
+        \def\verbatim@processline{%
+            \immediate\write\Code@out{\the\verbatim@line}}%
+        \verbatim@start}
+
+\def\endpython{%
+        \immediate\closeout\Code@out\@esphack
+    \endgroup
+
+     %Execute python script. Python directory must be in PATH.
+     \immediate\write18{python \FNameIn > \FNameOut}
+     \input{\FNameOut}
+}
+
+\makeatother
