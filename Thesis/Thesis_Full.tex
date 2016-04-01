@@ -301,7 +301,7 @@ Throughout our exploration of computation in distributed dynamic systems, we oft
 \subsection{Stomatal Dynamics Revisited: Utilizing Environmental Noise}
 We begin our review of robustness by revisiting plant stomatal dynamics. Unlike technological systems, biological systems such as stomatal arrays on plant leaves are often able to manage variable environments ``innately,'' without external intervention or control. Indeed, though stomatal systems behave similarly to majority task CAs as noted earlier in Section \ref{subsec:Stoma}, they face a number of irregularities not accounted for in the CA models such as \textit{heterogeneous interactions}, where local interactions may not be uniform due to stomatal size, orientation, and spacing,  or \textit{modularity}, where leaf veins cause stomata to be subdivided into modules that interact at a level beyond individual stoma interaction~\cite{me07}. Additionally, the stomatal systems must handle temporal \textit{state noise}, where there is unavoidable variability and imprecision in the stomatal functioning itself across time. Thus, \citeauthor{me07} examine the behavior and performance of stomatal-inspired majority task CAs in environments designed to mimic the irregularities plant stomata have to contend with.
 
-When considering the majority task, most initial configurations are relatively easy for CAs to classify correctly, where there are a large proportion of either ``on'' or ``off'' cells present in the space. Unsurprisingly, the most difficult cases are when the density of on and off cells are roughly equivalent. \citeauthor{me07} note that these hard cases often cause patchiness and are solved correctly only when the patches travel coherently across the CA space, emphasizing the importance of information transfer when supporting task performance in these locally connected networks. Unsuccessful CAs often have ``stuck'' patches that are unable to be resolved. Irregularities in the form of heterogeneous interactions, simulated by nonuniform rule tables and random connectivity, and modularity, simulated by grafting together ``mosaic'' networks of modules, both reduce the performance of the task CAs but do not cripple them~\cite{me07}. Perhaps most surprisingly, the majority task CAs actually \textit{improve} in performance when small amounts of state noise are introduced to the system while other defects are present. \citeauthor{me07} hypothesize that this is because the state noise cause small perturbations in the system, stimulating movement and perhaps freeing previously stuck patches to move about the space once more. We have seen how small changes can snowball and sweep through entire the entire CA space, and it appears that natural systems embrace noise and use it to their advantage. Indeed, randomness appears essential in facilitating the self-sustaining and self-informing function of decentralized biological systems~\cite{mi05}. We will turn to \citeauthor{mi05}'s analysis of how these systems might operate to illustrate how such structures can maintain themselves in such complex environments despite the lack of central control.
+When considering the majority task, most initial configurations are relatively easy for CAs to classify correctly, where there are a large proportion of either ``on'' or ``off'' cells present in the space. Unsurprisingly, the most difficult cases are when the density of on and off cells are roughly equivalent. \citeauthor{me07} note that these hard cases often cause patchiness and are solved correctly only when the patches travel coherently across the CA space, emphasizing the importance of information transfer when supporting task performance in these locally connected networks. Unsuccessful CAs often have ``stuck'' patches that are unable to be resolved. Irregularities in the form of heterogeneous interactions, simulated by nonuniform rule tables and random connectivity, and modularity, simulated by grafting together \textit{mosaic networks} of modules, both reduce the performance of the task CAs but do not cripple them~\cite{me07}. Perhaps most surprisingly, the majority task CAs actually \textit{improve} in performance when small amounts of state noise are introduced to the system while other defects are present. \citeauthor{me07} hypothesize that this is because the state noise cause small perturbations in the system, stimulating movement and perhaps freeing previously stuck patches to move about the space once more. We have seen how small changes can snowball and sweep through entire the entire CA space, and it appears that natural systems embrace noise and use it to their advantage. Indeed, randomness appears essential in facilitating the self-sustaining and self-informing function of decentralized biological systems~\cite{mi05}. We will turn to \citeauthor{mi05}'s analysis of how these systems might operate to illustrate how such structures can maintain themselves in such complex environments despite the lack of central control.
 
 %TODO Table 1 of me07 for noise improvement
 
@@ -1055,13 +1055,81 @@ The task performance of our two irregular grids are pictured in Figure~\ref{fig:
 
 \section{Majority Task Performance with State Noise}
 
-The goal is to investigate the impact of temporal noise on task-performing cellular automata.
+\citeauthor{me07} discovered in their investigations that introducing small amounts of state noise improves the performance of majority task CA, likely due to the fact that the random state change will stimulate movement across the grid~\cite{me07}. We will investigate the impact of state noise in more detail and in the context of irregular grids. 
 
-\begin{itemize}
-\item replication of Messinger's experiments
-\item Running Local Majority Experiments on Voronoi Grids, Stoma Voronoi
-\item Introduction of Noise
-\end{itemize}
+\subsection*{Experimental Setup}
+
+Data for task performance graphs is collected with the same setup and number of trials as in the previous section. State noise is introduced by changing each cell's correct output state with probability $\eta$ before the next timestep. State noise is not applied if the CA has reached a uniform configuration of either all ON or all OFF states. Since \citeauthor{me07} reported that state noise probabilities of $\eta \ge 0.1$ caused massive degradation of majority task performance, we consider a range of state noise from $\eta=0.01$ to $\eta=0.15$.
+
+Since initial ON/OFF ratios near 50:50 are the most difficult starting configurations to classify, we also perform experiments that measure the impact of state noise on ``hard'' initial configurations. For each state noise percentage, we generate 1,000 random initial configurations with ON/OFF ratios chosen from a Gaussian distribution $\mathcal{N}(0.5, 0.06)$.
+
+\subsection*{Results}
+
+Task performance graphs for regular grids with state noise $\eta=0.05$ and $\eta=0.15$ are shown in Figure~\ref{fig:lm_reg_noise}. We see that with an introduction of a small amount of noise ($\eta=0.05$) task performance dramatically improves, with incorrect classifications only occurring between ON/OFF ratios of 40:60 and 60:40 and with roughly 35\% correct classifications of 50:50 starting ratios. Conversely, when too much noise is introduced to the system ($\eta=0.15$), task performance across all starting ratios degrade below baseline levels. The task performance graphs for the irregular stoma grid with $\eta=0.05, 0.15$ also exhibit the same trend (Figure~\ref{fig:lm_stoma_noise}). However, for the stoma grid with $\eta=0.05$ only about 10\% of the 50:50 starting ratios are correctly classified, which is much poorer performance on 50:50 configurations compared to the regular grid. Overall however, the regular and irregular grids exhibit the same sort of behavior when varying levels of state noise are applied. With the addition of small amounts of state noise, the basic Local Majority rule table performs similarly to more complex rule tables; the performance graph for both regular and irregular grids at $\eta=0.05$ closely resembles the performance graph of the Sip rule pictured in Figure~\ref{fig:me07_baseline}, one of the best performing rule tables evaluated by \citeauthor{me07}~\cite{me07}.
+
+\begin{figure}[htp]
+\centering
+  \begin{subfigure}[t]{0.6\textwidth}
+  \includegraphics[width=\textwidth]{ch5_figs/baseline_noise_5}
+  \caption{Local Majority Task Performance on a Regular Grid with 5\% Noise}
+  \end{subfigure}
+  ~
+  \begin{subfigure}[t]{0.6\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch5_figs/baseline_noise_15}
+  \caption{Local Majority Task Performance on a Regular Grid with 15\% Noise}
+  \end{subfigure}
+\caption[Local Majority Task Performance for Regular Grids with Noise]{
+  Majority Task Performance graphs for regular grids with state noise $\eta = 0.05, 0.15$. Note the relative increase and decrease in task performance for low and high amounts of noise, respectively.
+}
+\label{fig:lm_reg_noise}
+\end{figure}
+
+\begin{figure}[htp]
+\centering
+  \begin{subfigure}[t]{0.6\textwidth}
+  \includegraphics[width=\textwidth]{ch5_figs/stoma_noise_5}
+  \caption{Local Majority Task Performance on the Stoma Grid with 5\% Noise}
+  \end{subfigure}
+  ~
+  \begin{subfigure}[t]{0.6\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch5_figs/stoma_noise_15}
+  \caption{Local Majority Task Performance on the Stoma Grid with 15\% Noise}
+  \end{subfigure}
+\caption[Local Majority Task Performance for the Stoma Grid with Noise]{
+    Majority Task Performance graphs for the irregular stomata grid with state noise $\eta = 0.05, 0.15$. Note that though the shape of the two graphs resemble those in Figure~\ref{fig:lm_reg_noise}, the irregular $\eta=0.05$ graph has a sharper drop-off in 50:50 initial ratio task performance.
+}
+\label{fig:lm_stoma_noise}
+\end{figure}
+
+The results for local majority task performance on ``hard'' configurations on both regular and stoma grids are shown in Figure~\ref{fig:lm_ff}. We see that task performance significantly increases when state noise $\eta \ge 0.02$ and then quickly degrades when state noise $\eta \ge 0.12$ for both grids. In the regular case, task performance stays relatively steady just above 70\% when $0.02 \le \eta \le 0.12$ while in the irregular stomatal case task performance gradually rises to about 60\% correct classification in that same state noise range. These results confirm that small amounts of state noise is beneficial for majority task performance, regardless of the spatial dynamics of the grid. These results also confirm the viability of irregular Voronoi grids in supporting majority task behavior, with task performance on the stomatal grid closely resembling the results on regular grids throughout all these experiments.
+
+\begin{figure}
+\centering
+  \begin{subfigure}[t]{0.6\textwidth}
+  \includegraphics[width=\textwidth]{ch5_figs/ff_reg}
+  \caption{Regular Grid Task Performance on Hard Configurations}
+  \end{subfigure}
+  ~
+  \begin{subfigure}[t]{0.6\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch5_figs/ff_stoma}
+  \caption{Stoma Grid Task Performance on Hard Configurations}
+  \end{subfigure}
+\caption[Local Majority Task Performance on ``Hard'' Configurations]{
+  Local Majority task performance graphs on ``hard'' configurations for both regular grids and stoma grids. For both grids, task performance improves significantly between $\eta=0.02$ and $\eta=0.12$ before falling at $\eta \ge 0.12$. 
+}
+\label{fig:lm_ff}
+\end{figure}
+
+\section{Summary}
+
+%TODO table of overall classification percentage?
+
+We have evaluated local majority task performance on both regular grids and irregular Voronoi grids. The profiles of the performance graphs show remarkable similarities between the regular and irregular grids in majority task performance. These similarities continue when we examine the impact of state noise, though the irregular grids perform slightly worse than the regular grids when noise is introduced. Still, we see that small amounts of state noise \textit{improve} task performance in both the regular and irregular grid cases, with their overall classification percentages rivaling those of more complex, human-engineered majority task rule tables.
+
+Thus, we see more evidence that randomness can facilitate the function of decentralized dynamic systems, and it seems plausible that biological systems utilizing local communication can overcome spatial irregularity and perform comparably to ``perfect'' CA systems even in noisy environments. Again, we see some evidence that spatially irregular grids can be functionally equivalent to their regular counterparts within a specific CA task domain.
 
 \processdelayedfloats
 
@@ -1069,6 +1137,12 @@ The goal is to investigate the impact of temporal noise on task-performing cellu
 
 \chapter{Lambda Degradation Experiments}
 \label{ch:lambda_degen}
+
+\section{The Langton-Wootters $\lambda$ Profile}
+
+\section{$\lambda$ Profile of Irregular Grids}
+
+\section{$\lambda$ Profile of Degenerated Grids}
 
 \begin{itemize}
 \item Replication/Setup of Wootter/Langton Experiment
