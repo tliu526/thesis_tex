@@ -84,7 +84,7 @@
 \listoffigures
 % for chapter headings
 
-
+\tableofcontents
 
 \chapter*{Abstract}
 
@@ -528,11 +528,13 @@ Experiments and simulations involving $\lambda$ require static neighborhood size
 \label{fig:vquad_grid}
 \end{figure}
 
-\subsection{Grid Degeneration}
+\section{Grid Degeneration}
+
 In Chapter \ref{ch:lambda_degen}, we consider various degenerated Voronoi Quad grids
 in our examination of the $\lambda$ parameter. We will discuss the methods for generating these degraded grids here.
 
-\subsubsection{Generator Point Removal}
+\subsection{Generator Point Removal}
+\label{subsec:gen_pt_rem}
 As noted in Section \ref{subsec:vquad}, VQuad grid generation is dependent on the position of Voronoi generator points in the input Voronoi diagram. Thus, one manner of grid degeneration is simply to remove generator points from the input diagram. Since a generator point in the input diagram could be a vertex to many VQuad cells, generator point removal has the effect of taking out large chunks of the VQuad grid, as pictured in \ref{fig:genpt_degen}.
 
 \begin{figure}[htp]
@@ -544,7 +546,8 @@ As noted in Section \ref{subsec:vquad}, VQuad grid generation is dependent on th
 \label{fig:genpt_degen}
 \end{figure}
 
-\subsubsection{Crosshatching Degeneration}
+\subsection{Crosshatching Degeneration}
+\label{subsec:ch_degen}
 Though generator point removal provides a simple way to degrade a grid, we wanted finer-grained control over how points and edges are removed. Thus we devised a manner of degradation that allowed us to specify what local regions of the grid would be disconnected from other portions of the grid. This basic premise is to draw vertical and horizontal lines at regular width $w$ intervals apart that subdivide the irregular grid roughly into square lattice regions. Cell edges that intersect these \textit{crosshatchings} are removed from the grid with some probability $p$: cells that were formerly connected by the edge no longer are neighbors in the graph representation of the grid. Thus at $p=1.0$ we would have completely isolated ``islands'' of grid subregions. This \textit{crosshatching degeneration} technique allows us control over the degree of regional connectivity, as pictured in Figure \ref{fig:crosshatch_degen}. This manner of degradation preserves the number of cells present in the grid, instead introducing degradation by decreasing edge adjacency. Though we primarily use crosshatching degeneration as a form of edge removal, this technique also gives us a way to control generator point removal: since the crosshatchings define a square lattice partitioning of the grid, we can also choose square regions to remove with some probability $p$. Any generator points sitting within the boundary of a chosen square region will be removed from the graph. Thus we can control both the frequency of generator points removed (through adjusting $p$) as well as the average size of the of the regions removed (through adjusting $w$). This crosshatching technique allows us to parameterize the degeneration of a grid beyond simply measuring average neighborhood size.
 
 \begin{figure}[htp]
@@ -675,10 +678,10 @@ Another goal is to investigate CA behavior at the boundary of the grid. Typical 
 
 In order to locate where interesting behavior may occur in Penrose Life, we begin by examining the full range of \textit{initial soup densities} (percentage of ON cells in the starting configuration) from $d=0.01$ to $d=0.99$, measuring both \textit{lifetime to stability} (the number of timesteps a given configuration takes to stabilize) and final \textit{ash density} (the percentage of the grid in a stable state).
 
-\subsection{Experimental Setup}
+\subsection*{Experimental Setup}
 Both Kite/Dart and Thin/Thick Rhomb Penrose tilings are considered. We utilize circular grids, with the Kite/Dart grid containing 995 cells and Rhomb grid containing 1,075 cells. The Rule Table utilizes standard Game of Life rules with generalized Moore neighborhood stencils. For each initial soup density we run 100 trials and average our statistics across all the trials, resulting in 9,900 CA simulations which. The tilings are pictured in Figure \ref{fig:penrose_circ}.
 
-\subsection{Results}
+\subsection*{Results}
 Lifetime to Stability and Ash Density graphs for Kites/Darts are pictured in Figure \ref{fig:ckd_lifetime_density}. These results agree with the data presented by \citeauthor{hi05} shown in Figure \ref{fig:hi05_lifetime_density}, with our circular tiling falling in between the S and M grids in terms of size: both lifetime graphs have a right-skewed distribution while the ash density plots show little correlation between lifetime and final ash density for initial soup densities of $d=0.20, 0.40, 0.60$. The ash densities fall within a range of about $d=0.00$ to $d=0.03$. It's important to note that though the lifetime graphs have the same distribution shape as the standard Game of Life lifetime graph, the average lifetimes for the Penrose tilings are much lower than the standard grid (Figure \ref{fig:hi05_reg_lifetime}). Similarly, though the ash density plots for the standard grid show no correlation between lifetime and ash density like the Kite/Dart plot (Figure \ref{fig:hi05_reg_density}), the final ash densities fall in a higher range of about $d=0.02$ to $d=0.06$. These results suggests that the overall qualitative behavior of Penrose Life could be similar to the standard Game of Life but also shows that it is much more difficult to maintain coherent Life structures on irregular grids.
 
 \begin{figure}[htp]
@@ -966,7 +969,7 @@ Our extensions of majority task experiments will focus on the \textit{local majo
 This rule table represents the most basic manner of solving the majority task and is easily extended to grids with variable neighborhood sizes.
 
 \subsection*{Experimental Setup}
-We mirror \citeauthor{me07}'s experimental setup in order to compare our results with theirs. For regular grids, a 15 by 15 grid (225 total cells) is utilized with periodic boundaries. We begin with a 1:99 ON/OFF ratio, incrementing by 1 percent up to 99:1. The simulation is run for a maximum of 450 time steps, recording only completely correct classification. 1,000 random grid configurations are used for every starting ratio, giivng a total of 99,000 trials. A single complete run takes approximately 25 minutes in our simulation system.
+We mirror \citeauthor{me07}'s experimental setup in order to compare our results with theirs. For regular grids, a 15 by 15 grid (225 total cells) is utilized with periodic boundaries. We begin with a 1:99 ON/OFF ratio, incrementing by 1 percent up to 99:1. The simulation is run for a maximum of 450 time steps, recording only completely correct classification. 1,000 random grid configurations are used for every starting ratio, giving a total of 99,000 trials. A single complete run takes approximately 25 minutes in our simulation system.
 
 We use Delaunay and Voronoi generation methods to generate our irregular grids. Our experiments utilize both a grid created through Poisson Disk generator points (Figure~\ref{fig:lm_delaunay}) as well as a grid created through a plant stomatal array. For the stomatal array, we begin with an image of the stomata and drop points where the stoma are located. We then utilize these points as generator points for a Delaunay triangulation. The entire process is pictured in Figure~\ref{fig:stoma_graph_gen}.
 
@@ -1152,7 +1155,7 @@ The \textit{random table} method for generating transition tables utilizes $\lam
 
 Entropy is calculated using the equations shown in Appendix~\ref{appA:entrop}. However, entropy calculations are made only for the asymptotic behavior of a given CA simulation: each CA simulation is run for 1,000 time steps, with entropy only measured after time step 500. So if a particular CA run has a lifetime of less than 500, its entropy value will be 0. This manner of calculating asymptotic entropy leads to numerous entropy measurements of 0, as pictured in both versions of the Langton-Wootters Profile. Also note that for $K=8, N=5$ CA, the maximum entropy is 3 with this maximum value occurring with a $\lambda$ value of 0.875 (Appendix~\ref{appB:max_H}). Thus, all experiments with $K=8, N=5$ CA consider a range of $\lambda$ values from $\lambda = 0.0$ to $\lambda = 0.88$. 
 
-\begin{figure}
+\begin{figure}[htp]
 \centering
   \begin{subfigure}[t]{0.6\textwidth}
   \includegraphics[width=\textwidth]{ch6_figs/la90_fig8_lambda_runs}
@@ -1167,21 +1170,254 @@ Entropy is calculated using the equations shown in Appendix~\ref{appA:entrop}. H
   \label{fig:lw_profile_rand}
   \end{subfigure}
 \caption[The Langton-Wootters Profile]{
-  Different forms of the Langton-Wootters Profile. Figure~\ref{fig:lw_profile_walk} shows 50 individual runs of the table-walk-through method of varying $\lambda$. Figure~\ref{fig:lw_profile_rand} shows both a scatter plot of data points collected through the random-table method of varying $\lambda$ and the theoretical Langton-Wootters Profile as predicted by mean-field theory (Appendix~\ref{appA:MFT}). Plots adapted from both \citeauthor{la90} and \citeauthor{wo90}~\cite{la90,wo90}.
+  Different forms of the Langton-Wootters Profile. Figure~\ref{fig:lw_profile_walk} shows 50 individual runs of the table-walk-through method of varying $\lambda$. Figure~\ref{fig:lw_profile_rand} shows both a scatter plot of data points collected through the random-table method of varying $\lambda$ and the theoretical Langton-Wootters Profile as predicted by mean-field theory (Appendix~\ref{appA:MFT}). Note how both plots produce the same envelope Plots adapted from both \citeauthor{la90} and \citeauthor{wo90}~\cite{la90,wo90}.
 }
 \label{fig:lw_profile}
 \end{figure}
 
 \subsection*{Analysis of the Langton-Wootters Profile}
 
-Both renditions of the LW-Profile indicate a bimodal distribution of entropy values, with most data points either collected around $H=0$ or $H \gtrsim 0.85$. There is a region where relatively few data points are observed over $0 \le \lambda \le 0.6$ and $0 < H \le 0.85$. The ``gap'' and bimodal distribution are indicators of a \textit{critical} transition, illustrating the boundary between non-complex CA with low $H$ values and complex CA with much higher $H$ values. This phenomenon is easy to see in Figure~\ref{fig:lw_profile_walk}, with individual transition table runs showing a sharp increase in entropy from below the gap to above the gap at a certain $\lambda$ value. This gap and sudden jump in $H$ are indications that critical transitions can occur in this particular class of CAs on regular grids. Thus, we will utilize these features of the LW-Profile to evaluate irregular grids on their ability to support complex behavior. 
+Both renditions of the LW-Profile indicate a bimodal distribution of entropy values, with most data points either collected around $H=0$ or $H \gtrsim 0.85$. There is a region where relatively few data points are observed over $0 \le \lambda \le 0.6$ and $0 < H \le 0.85$. This \textit{transition gap} and bimodal distribution are indicators of a critical transition, illustrating the boundary between non-complex CA with low $H$ values and complex CA with much higher $H$ values. This phenomenon is easy to see in Figure~\ref{fig:lw_profile_walk}, with individual transition table runs showing a sharp increase in entropy from below the gap to above the gap at a certain $\lambda$ value. This gap and sudden jump in $H$ are indications that critical transitions can occur in this particular class of CAs on regular grids. Thus, we will utilize these features of the LW-Profile to evaluate irregular grids on their ability to support complex behavior. 
 
-Also note that entropy values converge rapidly when $\lambda > 0.6$, an indication of the shift of rule tables from complex (Class IV) to chaotic (Class III) (Chapter~\ref{subsec:metrics}). The most interesting action occurs when the variance of entropy values is high, again corresponding to the critical transition gap and jump in entropy from around $H=0.0$ to $H > 0.85$. \citeauthor{la90} discusses the ``ceiling'' of this transition region, noting that $H \approx 0.84$ is the average entropy value of a commonly occurring low $\lambda$ chaotic rule, another indication that the gap in data points for $0 < H \le 0.85$ is indicative of a critical transition.
+Also observe that entropy values converge rapidly when $\lambda > 0.6$, an indication of the shift of rule tables from complex (Class IV) to chaotic (Class III) (Chapter~\ref{subsec:metrics}). The most interesting action occurs when the variance of entropy values is high, again corresponding to the critical transition gap and jump in entropy from around $H=0.0$ to $H > 0.85$. \citeauthor{la90} discusses the ``ceiling'' of this transition region, noting that $H \approx 0.84$ is the average entropy value of a commonly occurring low $\lambda$ chaotic rule~\cite{la90}, another indication that the gap in data points for $0 < H \le 0.85$ is indicative of a critical transition.
 
 \section{$\lambda$ Profile of Irregular Grids}
 
+\subsection*{Experimental Setup}
+
+We utilize the table walk-through method when varying $\lambda$ for our experiments, as both line and scatter plots can be generated from the resulting data. Though \citeauthor{wo90} run their CA simulations to 1,000 time steps, we saw no difference in the shape of the LW-Profiles between trials with a maximum time step of 500 and trials with a maximum time step of 1,000 (Figure~\ref{fig:lw_reg_short_long}), so in the interest of efficiency we run our experiments with a maximum of 500 time steps with an asymptotic threshold of 250 time steps. 100 individual table walk-through runs for $K=8, N=5$ CA are made, incrementing $\lambda$ from $0.0$ to $0.88$. Since we are examining the $K=8, N=5$ CA class, we require the cells in our grid to have four neighbors. Thus, grids generated with the Voronoi Quadrilateral technique as discussed in Chapter~\ref{subsec:vquad} are appropriate irregular spaces for considering these CA. We apply the VQuad grid generation technique to a Voronoi diagram generated by a Poisson Disk distribution of generator points and to the Voronoi diagram produced by the stomatal array (Figure~\ref{fig:vquad_stoma_gen}). Additionally, we also examine Penrose grids utilizing the generalized von Neumman neighborhood stencil, which also produces neighborhoods of $N=5$. Both Kite/Dart and Thin/Thick Rhomb grids are considered, shown in Figure~\ref{fig:penrose_circ}.
+
+With irregular grids, periodic boundary conditions are not possible, so boundary cell neighborhoods are ``completed'' by inserting quiescent states. Note that this decision could potentially skew the resultant entropy measurements lower, but we have seen some functional equivalence between periodic and non-periodic grids previously with our experiments in Chapter~\ref{ch:local_maj}. Neighborhood cells are ordered clockwise from the origin; since the $\lambda$ rule tables produced are isotropic only the relative ordering of neighborhood cells matter. Cell state frequencies are measured at every time step, so entropy values are computed as an average over the data points collected after the asymptotic threshold.
+
+\begin{figure}[htp]
+\centering
+  \begin{subfigure}[t]{0.6\textwidth}
+  \includegraphics[width=\textwidth]{ch6_figs/v_stoma_edited}
+  \caption{Voronoi Diagram of Stomatal Array}
+  \end{subfigure}
+  ~
+  \begin{subfigure}[t]{0.6\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/q_stoma}
+  \caption{VQuad Diagram of Stomatal Array}
+  \end{subfigure}
+\caption[VQuad Generation from Stomatal Array]{
+An illustration of the Voronoi representation of the stomatal array from Figure~\ref{fig:stoma_graph_gen} and the resultant Voronoi Quad grid. 
+}
+\label{fig:vquad_stoma_gen}
+\end{figure}
+
+\begin{figure}[htp]
+\centering
+  \begin{subfigure}[t]{0.6\textwidth}
+  \includegraphics[width=\textwidth]{ch6_figs/reg_entropy_500_scatter}
+  \caption{Short Simulation ($t_{max} = 500$) Langton-Wootters Profile}
+  \label{fig:lw_profile_short}
+  \end{subfigure}
+  ~
+  \begin{subfigure}[t]{0.6\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/reg_entropy_1000_scatter}
+  \caption{Long Simulation ($t_{max} = 1000$) Langton-Wootters Profile}
+  \label{fig:lw_profile_long}
+  \end{subfigure}
+\caption[Langton-Wootters Profile for Short and Long Simulations]{
+  Langton-Wootters Profiles for both short and long simulations. The overall shape and distribution of data points throughout the graph are largely identical. Thus, it appears that equivalent asymptotic behavior can be achieved within different time scales. Note that in our scatter plots, darker dots indicate higher frequency of values. So, we can see both the tight convergence of entropy at high $\lambda$ values and the high frequency of runs that do not reach the asymptotic threshold, resulting in an entropy value of 0.
+}
+\label{fig:lw_reg_short_long}
+\end{figure}
+
+\subsection*{Results}
+
+The LW-Profiles for our Poisson Disk and Stomatal Voronoi Quad grids are pictured in Figure~\ref{fig:vor_lw_profile} and Figure~\ref{fig:stoma_lw_profile} respectively. In both cases, despite the irregularity in the cell orientation and the non-periodic boundary conditions, we see a remarkably similar shape in the LW-Profile for the Voronoi Quad grids. Examination of Figures \ref{fig:vor_lw_run} and \ref{fig:stoma_lw_run} show all of the individual CA runs experiencing a significant jump in entropy values at some point, evidence of a transition event. The corresponding scatter plots (Figures \ref{fig:vor_lw_scatter} and \ref{fig:stoma_lw_scatter}) of these graphs show that the transition gap in $0 \le H \le 0.84$ is also sparsely populated. There appear to be slightly more data points found in the gap for the stoma grid scatter plot compared to the Poisson Disk grid plot; we speculate that the size of the grid may have an influence on a CA's ability to compute, and the Poisson Disk grid is significantly larger than the stomatal grid. 
+
+LW-Profiles for the Penrose tilings are pictured in Figure~\ref{fig:penrose_lw_profile}. Though the overall shape of the curves are still in line with the baseline profile, we see some small deviations in the LW-Profile for Rhomb tilings, shown in Figure~\ref{fig:crh_lw_profile}. First, we see that the transition gap contains a fair amount of data points, spanning a much larger range of $\lambda$ than any of the other grids we have examined with points in the gap found at $\lambda < 0.2$. There is also more variance in the data points above the transition gap, producing a slightly looser convergence as $\lambda$ increases. These discrepancies are surprising given our Penrose Life experiments in Chapter~\ref{ch:penrose} showing that the Rhomb tilings supported longer living structures, which suggests that the grids would be better suited for supporting complex behavior. Thus, there is a need for a way to quantify how these graphs may differ from one another, as visual inspection is not an adequate measure of such differences. Overall however, we see entropy profile behavior equivalent to those seen in the baseline experiments as we vary $\lambda$ across all of these irregular grids, suggesting a functional equivalence between irregular, non-periodic quadrilateral grids and their regular, periodic square counterparts. With the preservation of both the overall shape and a well-defined transition gap of the LW-Profiles we have examined, it appears that complex behavior can be supported in all of these irregular quadrilateral grids.
+
+\begin{figure}[htp]
+\centering
+\begin{subfigure}[t]{0.6\textwidth}
+  \includegraphics[width=\textwidth]{ch6_figs/vor_entropy}
+  \caption{VQuad Langton-Wootters Profile (Individual Runs)}
+  \label{fig:vor_lw_run}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.6\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/vor_entropy_scatter}
+  \caption{VQuad Langton-Wootters Profile (Scatter Plot)}
+  \label{fig:vor_lw_scatter}
+\end{subfigure}
+\caption[Voronoi Quad Langton-Wootters Profile]{
+  The Langton-Wootters Profile for a Voronoi Quad grid generated with a Poisson Disk distribution of 4,032 generator points resulting in a VQuad grid with 11,480 cells. Note how closely the scatter plot for the Voronoi Quad grid resembles the shape of the baseline Langton-Wootters Profile in Figure~\ref{fig:lw_profile}. There are very little points observed within the transition gap, and ceiling of the gap is sharply demarcated. It appears that despite the non-periodic boundary conditions and the irregular spatial distribution of grids, this Voronoi Quad grid is capable of supporting complex CA behavior.
+}
+\label{fig:vor_lw_profile}
+\end{figure}
+
+\begin{figure}[htp]
+\centering
+\begin{subfigure}[t]{0.6\textwidth}
+  \includegraphics[width=\textwidth]{ch6_figs/stoma_entropy}
+  \caption{Stoma Langton-Wootters Profile (Individual Runs)}
+  \label{fig:stoma_lw_run}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.6\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/stoma_entropy_scatter}
+  \caption{Stoma Langton-Wootters Profile (Scatter Plot)}
+  \label{fig:stoma_lw_scatter}
+  \end{subfigure}
+\caption[Stoma Langton-Wootters Profile]{
+  The Langton-Wootters Profile for the Voronoi Quad grid generated from the plant stomatal array (Figure~\ref{fig:vquad_stoma_gen}) resulting in 984 total cells. Like the Poisson Disk VQuad grid, we see a strong resemblance between the overall shape of the graph with the baseline LW-Profile with Figure~\ref{fig:stoma_lw_run} showing the large transition jumps in entropy seen in Figure~\ref{fig:lw_profile}. We do see more ``noise'' within the transition gap region compared to Figure~\ref{fig:vor_lw_scatter}. The size of the grid may be a factor in supporting complex behavior, as the stomatal grid is significantly smaller than the Poisson Disk grid. Still, the equivalence in shape of this plot to the baseline suggests that this stomatal grid can also support complex, class IV CAs.
+}
+\label{fig:stoma_lw_profile}
+\end{figure}
+
+\begin{figure}[htp]
+\centering
+\begin{subfigure}[t]{0.6\textwidth}
+  \includegraphics[width=\textwidth]{ch6_figs/ckd_entropy_scatter}
+  \caption{Kite/Dart Langton-Wootters Profile}
+  \label{fig:ckd_lw_profile}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.6\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/crh_entropy_scatter}
+  \caption{Thin/Thick Rhombus Langton-Wootters Profile}
+  \label{fig:crh_lw_profile}
+  \end{subfigure}
+\caption[Penrose Langton-Wootters Profile]{
+  The Langton-Wootters Profile for both types of Penrose grids. Though both plots maintain the same overall shape as the baseline LW-Profile, there appears to be significantly more noise throughout the entire graph for the Rhomb grid, with more points within the transition gap and looser convergence to the overall profile shape at entropy values above the transition gap. This is surprising given that our Penrose Life experiments showed the Rhomb tilings supporting longer living Life structures than the Kites/Dart tiling, suggesting that perhaps the Rhomb tilings would be better suited for supporting complex CA behavior in general.
+}
+\label{fig:penrose_lw_profile}
+\end{figure}
+
 \section{$\lambda$ Profile of Degenerated Grids}
 
+Now that some equivalence in CA behavior has been established for our irregular grids, we want to examine how these grids respond to degradation. We expose CA systems to other forms of spatial irregularity through introducing ``internal'' boundaries by removing cells and through isolating local regions by reducing neighborhood connectivity. Our goal is to examine how robust cellular automata can be when facing spatial deterioration, another form of environmental noise (see Chapter~\ref{sec:Robust}) natural systems have to combat.
+
+\subsection{Generator Point Degeneration}
+
+\subsubsection*{Experimental Setup}
+We introduce internal boundary conditions by removing cells through the generator point removal technique outlined in Chapter~\ref{subsec:gen_pt_rem}. We apply degeneration percentages of $0.05,0.1, 0.15, 0.20$ to our stomatal Voronoi Quad grid, seen in Figure~\ref{fig:stoma_gen_pt_degen}. We then perform the same $\lambda$ experiments from the previous section, running simulations of $\lambda=0.01...0.87$ with $t_{max} = 500$ and the asymptotic threshold at $t=250$ for 100 total trials. 
+
+\begin{figure}[htp]
+\centering
+\begin{subfigure}[t]{0.4\textwidth}
+  \includegraphics[width=\textwidth]{ch6_figs/degen_stoma_5_grid}
+  \caption{5\% Generator Point Degeneration}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/degen_stoma_10_grid}
+  \caption{10\% Generator Point Degeneration}
+  \end{subfigure}
+
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/degen_stoma_15_grid}
+  \caption{15\% Generator Point Degeneration}
+  \end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/degen_stoma_20_grid}
+  \caption{20\% Generator Point Degeneration}
+  \label{fig:stoma_gen_pt_20}
+  \end{subfigure}
+
+\caption[Stomatal Generator Point Degeneration]{
+  Representative degenerated Stomatal Grids through generator point removal. Notice how the generator point removal method causes relatively large areas of cells to be erased; there are no single cell removals from this technique. With randomized generator point deletion, it is difficult for regions of the grid to be completely isolated. Even with a significant number of generator points removed, the remaining cells shown in Figure~\ref{fig:stoma_gen_pt_20} still form a completely connected grid.
+}
+\label{fig:stoma_gen_pt_degen}
+\end{figure}
+
+\subsubsection*{Results}
+
+The resulting Langton-Wootters Profiles are pictured in Figure~\ref{fig:lw_gen_pt_degen}. We see that at 5\% degeneration (Figure~\ref{fig:lw_degen_pt_5}), the overall profile structure is largely unchanged from the non-degraded LW-Profile for the stoma grid (Figure~\ref{fig:stoma_lw_scatter}) with only a slightly looser convergence at higher entropy values being observed. We see similar results at 10\% and 15\% degeneration as well, with looser convergence and an increase in data points found within the transition gap. However, for all three of these graphs we still see a clear demarcation of the transition gap itself as well as the preservation of the overall profile shape. It appears that transition events can occur even with relatively large amounts of spatial deterioration introduced, showing that CA systems can be robust and degrade gracefully. However, there is a breaking point, as we see in Figure~\ref{fig:lw_degen_pt_20} at 20\% degeneration: the transition gap completely collapses, with many data points observed within the $0 \le H \le 0.85$ range. We also see very loose convergence of $H$, even at higher $\lambda$. The grid in this case has suffered too much damage and is now incapable of supporting complex behavior. From visual inspection, we speculate that the 20\% degeneration made information transfer across the space too difficult for complex behavior to be facilitated. Still, it is remarkable that complex CA systems could still functionally operate with as much as 15\% deterioration applied to the grid.
+
+
+\begin{figure}[htp]
+\centering
+\begin{subfigure}[t]{0.4\textwidth}
+  \includegraphics[width=\textwidth]{ch6_figs/degen_stoma_5}
+  \caption{LW-Profile, 5\% Degeneration}
+  \label{fig:lw_degen_pt_5}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/degen_stoma_10}
+  \caption{LW-Profile, 10\% Degeneration}
+  \label{fig:lw_degen_pt_10}
+  \end{subfigure}
+
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/degen_stoma_15}
+  \caption{LW-Profile, 15\% Degeneration}
+  \label{fig:lw_degen_pt_15}
+  \end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/degen_stoma_20}
+  \caption{LW-Profile, 20\% Degeneration}
+  \label{fig:lw_degen_pt_20}
+  \end{subfigure}
+
+\caption[Langton-Wootters Profile for Generator Point Degeneration]{
+  Langton-Wootters Profiles for generator point degeneration. Notice that the shape of the profile as well as the transition gap is maintained at 5\% degeneration. The preservation of the overall structure of the profile continues at both 10\% and 15\% degeneration, with only more noise being observed within the transition gap. At 20\% degeneration however, the ceiling of the transition gap collapses, losing both the well-defined boundaries of the gap as well as introducing significant noise within the region where $0 \le H \le 0.85$.
+}
+\label{fig:lw_gen_pt_degen}
+\end{figure}
+
+\subsection{Crosshatching Degeneration}
+
+In the previous section, we degraded a CA grid by randomly deleting cells from it. In order to more tightly control how spatial degeneration occurred throughout the grid, we utilize the crosshatching degeneration method described in Chapter~\ref{subsec:ch_degen}. With this technique, we can vary how isolated local regions are within the grid without having to explicitly remove cells. This allows us to investigate the role of both overall grid size and connectivity in supporting complex CA behavior.
+
+\subsubsection*{Experimental Setup}
+Crosshatching degeneration is applied to our stomatal VQuad grid with crosshatch widths of $w=10,15,20,25,30$. The edge removal probability $p$ ranges from $p=0.05$ to $p=1.0$, in increments of $0.05$. Otherwise, $\lambda$ experiments are run in an identical manner as the previous two sections.
+
+\begin{figure}[htp]
+\centering
+\begin{subfigure}[t]{0.4\textwidth}
+  \includegraphics[width=\textwidth]{ch6_figs/cross_hatch_p25_w10}
+  \caption{Crosshatch Degeneration, $w=10$, $p=0.25$}
+
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/cross_hatch_p50_w10}
+  \caption{Crosshatch Degeneration, $w=10$, $p=0.50$}
+
+  \end{subfigure}
+
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/cross_hatch_p75_w10}
+  \caption{Crosshatch Degeneration, $w=10$, $p=0.75$}
+
+  \end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/cross_hatch_p100_w10}
+  \caption{Crosshatch Degeneration, $w=10$, $p=1.0$}
+
+  \end{subfigure}
+
+\caption[Crosshatch Degeneration, $w=10$]{
+}
+
+\end{figure}
+
+\subsubsection*{Results}
+
+\iffalse
 \begin{itemize}
 \item Replication/Setup of Wootter/Langton Experiment
 \item Lambda Profile of Irregular Grids
@@ -1189,6 +1425,10 @@ Also note that entropy values converge rapidly when $\lambda > 0.6$, an indicati
 \item Lambda Degeneration (simple): TODO run MSE on these graphs
 \item Lambda Degeneration (crosshatching)
 \end{itemize}
+\fi
+%\section{Summary}
+
+%What are the conditions that render Grids incapable of supporting complex computation? Information transfer is important, but there also appear to be other factors (look to generator point degeneration and then the crosshatching degeneration).
 
 \processdelayedfloats
 
@@ -1198,10 +1438,18 @@ Also note that entropy values converge rapidly when $\lambda > 0.6$, an indicati
 
 \begin{itemize}
 
-\item majority task experiments beyond local majority
+\item measurements of ``speed of light'' across degraded grids
+\item Are we fooling ourselves? Other factors, such as neighborhood degree, boundary conditions that skew our results?
+
+\item we make assumption of discrete rule tables, what about continuity in natural systems?
+
+\item majority task experiments beyond local majority?
+
+\item are there other measures that could better characterize the CA space
+\item how do we closely examine the \textit{critical region}, detecting interesting behavior is hard
 \item adaptation of $\gamma$ parameter to irregular 2D grids
-\item attractor basin work
 \item power law work
+\item attractor basin work?
 
 \end{itemize}
 
