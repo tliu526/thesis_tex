@@ -38,6 +38,8 @@
 
 \makeatother
 
+%For increasing the space allowed for floats
+\renewcommand\floatpagefraction{0.9}
 
 %\usepackage{multido}
 
@@ -1178,7 +1180,6 @@ Entropy is calculated using the equations shown in Appendix~\ref{appA:entrop}. H
 \subsection*{Analysis of the Langton-Wootters Profile}
 
 Both renditions of the LW-Profile indicate a bimodal distribution of entropy values, with most data points either collected around $H=0$ or $H \gtrsim 0.85$. There is a region where relatively few data points are observed over $0 \le \lambda \le 0.6$ and $0 < H \le 0.85$. This \textit{transition gap} and bimodal distribution are indicators of a critical transition, illustrating the boundary between non-complex CA with low $H$ values and complex CA with much higher $H$ values. This phenomenon is easy to see in Figure~\ref{fig:lw_profile_walk}, with individual transition table runs showing a sharp increase in entropy from below the gap to above the gap at a certain $\lambda$ value. This gap and sudden jump in $H$ are indications that critical transitions can occur in this particular class of CAs on regular grids. Thus, we will utilize these features of the LW-Profile to evaluate irregular grids on their ability to support complex behavior. 
-
 Also observe that entropy values converge rapidly when $\lambda > 0.6$, an indication of the shift of rule tables from complex (Class IV) to chaotic (Class III) (Chapter~\ref{subsec:metrics}). The most interesting action occurs when the variance of entropy values is high, again corresponding to the critical transition gap and jump in entropy from around $H=0.0$ to $H > 0.85$. \citeauthor{la90} discusses the ``ceiling'' of this transition region, noting that $H \approx 0.84$ is the average entropy value of a commonly occurring low $\lambda$ chaotic rule~\cite{la90}, another indication that the gap in data points for $0 < H \le 0.85$ is indicative of a critical transition.
 
 \section{$\lambda$ Profile of Irregular Grids}
@@ -1379,7 +1380,7 @@ The resulting Langton-Wootters Profiles are pictured in Figure~\ref{fig:lw_gen_p
 In the previous section, we degraded a CA grid by randomly deleting cells from it. In order to more tightly control how spatial degeneration occurred throughout the grid, we utilize the crosshatching degeneration method described in Chapter~\ref{subsec:ch_degen}. With this technique, we can vary how isolated local regions are within the grid without having to explicitly remove cells. This allows us to investigate the role of both overall grid size and connectivity in supporting complex CA behavior.
 
 \subsubsection*{Experimental Setup}
-Crosshatching degeneration is applied to our stomatal VQuad grid with crosshatch widths of $w=10,15,20,25,30$. The edge removal probability $p$ ranges from $p=0.05$ to $p=1.0$, in increments of $0.05$. Otherwise, $\lambda$ experiments are run in an identical manner as the previous two sections.
+Crosshatching degeneration is applied to our stomatal VQuad grid with crosshatch widths of $w=10,15,20,25,30$. The edge removal probability $p$ ranges from $p=0.05$ to $p=1.0$, in increments of $0.05$. We degenerate the grid for each $\lambda$ trial, producing new crosshatchings for every run. Some representative images of grids are shown in Figures \ref{fig:ch_w10_grid}, \ref{fig:ch_w20_grid}, and \ref{fig:ch_w30_grid}. Otherwise, $\lambda$ experiments are run in an identical manner as the previous two sections, with 100 trials varying $\lambda$ from $\lambda=0.01...0.88$.
 
 \begin{figure}[htp]
 \centering
@@ -1411,22 +1412,219 @@ Crosshatching degeneration is applied to our stomatal VQuad grid with crosshatch
   \end{subfigure}
 
 \caption[Crosshatch Degeneration, $w=10$]{
+  Representative grids for crosshatching degeneration $w=10$ applied to the stomatal VQuad grid. Notice how at $p=1.0$, the crosshatchings are placed so close together that subregion partitions are not well-defined.
 }
-
+\label{fig:ch_w10_grid}
 \end{figure}
 
-\subsubsection*{Results}
+\begin{figure}[htp]
+\centering
+\begin{subfigure}[t]{0.4\textwidth}
+  \includegraphics[width=\textwidth]{ch6_figs/cross_hatch_p25_w20}
+  \caption{Crosshatch Degeneration, $w=20$, $p=0.25$}
 
-\iffalse
-\begin{itemize}
-\item Replication/Setup of Wootter/Langton Experiment
-\item Lambda Profile of Irregular Grids
-\item Lambda Profile of Penrose? (glider lambda?)
-\item Lambda Degeneration (simple): TODO run MSE on these graphs
-\item Lambda Degeneration (crosshatching)
-\end{itemize}
-\fi
-%\section{Summary}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/cross_hatch_p50_w20}
+  \caption{Crosshatch Degeneration, $w=20$, $p=0.50$}
+
+  \end{subfigure}
+
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/cross_hatch_p75_w20}
+  \caption{Crosshatch Degeneration, $w=20$, $p=0.75$}
+
+  \end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/cross_hatch_p100_w20}
+  \caption{Crosshatch Degeneration, $w=20$, $p=1.0$}
+
+  \end{subfigure}
+
+\caption[Crosshatch Degeneration, $w=20$]{
+  Representative grids for crosshatching degeneration $w=20$ applied to the stomatal VQuad grid. As opposed to the $w=10$ case, when $p=1.0$ the crosshatchings partition the grid into clear subregion ``boxes.''
+}
+\label{fig:ch_w20_grid}
+\end{figure}
+
+\begin{figure}[htp]
+\centering
+\begin{subfigure}[t]{0.4\textwidth}
+  \includegraphics[width=\textwidth]{ch6_figs/cross_hatch_p25_w30}
+  \caption{Crosshatch Degeneration, $w=30$, $p=0.25$}
+
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/cross_hatch_p50_w30}
+  \caption{Crosshatch Degeneration, $w=30$, $p=0.50$}
+
+  \end{subfigure}
+
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/cross_hatch_p75_w30}
+  \caption{Crosshatch Degeneration, $w=30$, $p=0.75$}
+
+  \end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/cross_hatch_p100_w30}
+  \caption{Crosshatch Degeneration, $w=30$, $p=1.0$}
+
+  \end{subfigure}
+
+\caption[Crosshatch Degeneration, $w=30$]{
+  Representative grids for crosshatching degeneration $w=20$ applied to the stomatal VQuad grid. Again when $p=1.0$, the crosshatchings partition the grid into square subregions.
+}
+\label{fig:ch_w30_grid}
+\end{figure}
+
+
+\subsubsection*{Qualitative Analysis}
+
+Some representative entropy profiles are shown in Figures \ref{fig:lw_ch_10}, \ref{fig:lw_ch_20}, and \ref{fig:lw_ch_30} for $w=10,20,30$, respectively. In the $w=10$ case, we see massive degeneration of the structure of the grid in the $p=0.75$ (Figure~\ref{fig:lw_w10_p75}) and $p=1.0$ (Figure~\ref{fig:lw_w10_p100}) graphs, with a loss of both the convergence of entropy values as well as the well-defined transition gap; if we look back to Figure~\ref{fig:ch_w10_grid}, we see that at $p=0.75$ and $p=1.0$ there is widespread edge removal across the entire grid with very little contiguous grid regions. This sort of damage is too much for a CA to overcome, and critical transitions are not observed on these grids. 
+
+As the width of the crosshatching increases however, we see much more robust behavior. When $w=20$, we see preservation of the baseline LW-Profile structure across all $p$ values, with only a slight weakening of convergence when $w=1.0$ (Figure~\ref{fig:lw_w20_p100}). Again the entropy profile structure is maintained when $w=30$, with tight convergence even when $w=1.0$. As the crosshatching width increases, there are fewer edges being removed from the grid, and larger contiguous subregions of the grid are preserved. Thus, we expect CA behavior to be more robust to grid degradation as the crosshatching width increases. Though we have evaluated these results through visual inspection of the LW-Profiles, we will explore a more quantitative manner of assessing CA behavior on damaged grids.
+
+\begin{figure}[htp]
+\centering
+\begin{subfigure}[t]{0.4\textwidth}
+  \includegraphics[width=\textwidth]{ch6_figs/ch_w10_p25_entropy_scatter}
+  \caption{Crosshatch Degen, $w=10$, $p=0.25$}
+
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/ch_w10_p50_entropy_scatter}
+  \caption{Crosshatch Degen, $w=10$, $p=0.50$}
+
+  \end{subfigure}
+
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/ch_w10_p75_entropy_scatter}
+  \caption{Crosshatch Degen, $w=10$, $p=0.75$}
+  \label{fig:lw_w10_p75}
+  \end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/ch_w10_p100_entropy_scatter}
+  \caption{Crosshatch Degen, $w=10$, $p=1.0$}
+  \label{fig:lw_w10_p100}
+  \end{subfigure}
+
+\caption[Crosshatch Langton-Wootters Profile, $w=10$]{
+  Langton-Wootters Profile for $w=10$ Crosshatch Degeneration. Though the profiles resemble the baseline structure when $p=0.25$ and $p=0.5$, we see a large increase in the variance of entropy values, producing very loose convergence and the loss of a well-defined transition gap at $p=0.75$. For $p=1.0$ we see a complete collapse in the profile of the entropy graph; the grid is far too damaged to support complex CA behavior.
+}
+\label{fig:lw_ch_10}
+\end{figure}
+
+\begin{figure}[htp]
+\centering
+\begin{subfigure}[t]{0.4\textwidth}
+  \includegraphics[width=\textwidth]{ch6_figs/ch_w20_p25_entropy_scatter}
+  \caption{Crosshatch Degen, $w=20$, $p=0.25$}
+
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/ch_w20_p50_entropy_scatter}
+  \caption{Crosshatch Degen, $w=20$, $p=0.50$}
+
+\end{subfigure}
+
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/ch_w20_p75_entropy_scatter}
+  \caption{Crosshatch Degen, $w=20$, $p=0.75$}
+
+  \end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/ch_w20_p100_entropy_scatter}
+  \caption{Crosshatch Degen, $w=20$, $p=1.0$}
+  \label{fig:lw_w20_p100}
+  \end{subfigure}
+
+\caption[Crosshatch Langton-Wootters Profile, $w=20$]{
+  Langton-Wootters Profile for $w=20$ Crosshatch Degeneration. We see a much better maintenance of the baseline structure through all $p$ compared to the $w=10$ case. We see a fair amount of noise in the transition gap throughout the four graphs, but the gap itself is well-defined in every case. Only at $p=1.0$ do we also see some ``sagging'' convergence of higher entropy values. Overall, CA systems appear able to perform adequately even with some subregions of the grid completely isolated from one another, provided that the subregions themselves are adequately large.
+}
+\label{fig:lw_ch_20}
+\end{figure}
+
+\begin{figure}[htp]
+\centering
+\begin{subfigure}[t]{0.4\textwidth}
+  \includegraphics[width=\textwidth]{ch6_figs/ch_w30_p25_entropy_scatter}
+  \caption{Crosshatch Degen, $w=30$, $p=0.25$}
+
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/ch_w30_p50_entropy_scatter}
+  \caption{Crosshatch Degen, $w=30$, $p=0.50$}
+
+  \end{subfigure}
+
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/ch_w30_p75_entropy_scatter}
+  \caption{Crosshatch Degen, $w=30$, $p=0.75$}
+
+  \end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch6_figs/ch_w30_p100_entropy_scatter}
+  \caption{Crosshatch Degen, $w=30$, $p=1.0$}
+  \label{fig:lw_w30_p100}
+  \end{subfigure}
+
+\caption[Crosshatch Langton-Wootters Profile, $w=30$]{
+  Langton-Wootters Profile for $w=30$ Crosshatch Degeneration. Again, overall structure of the entropy profile is maintained at all $p$, with the only deviations being data points observed in the transition gap. We see tight convergence of entropy values in all the graphs, even when $p=1.0$.  It appears that larger crosshatching widths impact the behavior of CA systems less; this is unsurprising as there are less edges removed from the grid and larger subregions being created as a result of the wider width.
+}
+
+\label{fig:lw_ch_30}
+\end{figure}
+
+\subsubsection*{Quantitative Analysis}
+We devised a measure that will quantify a given grid's ability to support computation or other complex behavior that utilizes mean-field theory to provide a theoretical approximation of the LW-Profile. Using the theoretical mean-field theory approximation of entropy against $\lambda$ for $K=8, N=5$ cellular automata (Figure~\ref{fig:mft_lambda}), we calculate a given graph's \textit{mean squared error} (Equation~\ref{eq:mse}), measuring its deviation from the theoretical curve. Here, we are taking the expected value of the square distance between the estimated value $\hat{Y}$ and the actual observations $Y_i$. We use the MSE value of the standard periodic square grid as a baseline for comparison when we degrade the grid.
+
+\begin{equation}
+MSE = \frac{1}{n}\sum^n_{i=1}(\hat{Y}_i - Y_i)^2
+\label{eq:mse}
+\end{equation}
+
+The MSE plot for all of our data is shown in Figure~\ref{fig:ch_mse}. Note that for $w=10$ and $w=15$ the increase of MSE is almost quadratic as $p$ increases. The extremely high MSE value for $w=10$, $p=1.0$ is to be expected if we look to its corresponding $\lambda$ profile (Figure~\ref{fig:lw_w10_p100}) and how far its shape deviates from the baseline profile. The MSE rate of increase decreases across all $p$ values as $w$ goes up however, and we see some confirmation of our qualitative analysis: MSE values increase linearly when $w \ge 20$ as opposed to a roughly quadratic increase, and we previously noted that for $w \ge 20$, $\lambda$ profiles maintain the same overall baseline structure regardless of $p$. Overall, the use of MSE as a quantitative measure of critical behavior on CA grids seems informative, as structural features of a grid's $\lambda$ profile are appropriately represented in the MSE value. Additionally, with these results we hypothesize that CA systems have the ability to perform robustly even in the face of significant amounts of spatial irregularity. Of course there is a breaking point, but throughout our degradation experiments we have seen remarkable resilience of CA system performance on a myriad of irregular grids.
+
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.6\textwidth]{ch6_figs/ch_mse_10_30}
+\caption[Mean Squared Error for Crosshatching Degeneration]{
+  The Mean Square Error graph for our Crosshatching Degeneration experiments. We calculate average MSE over 100 trials for $p=0.10$ to $p=1.0$ with increments of $0.05$. The baseline value of $0.4234$ is the MSE for a 64 by 64 square periodic grid, the same parameters used for \citeauthor{wo90}'s initial $\lambda$ experiments. There is a rise in MSE as $p$ increases across all widths, but we see an almost quadratic increase in MSE for $w=10$; this is not surprising, given how many edges are removed from $w=10$ grids (Figure~\ref{fig:ch_w10_grid}) and how degraded their $\lambda$ profiles are at higher values of $p$ (Figure  \ref{fig:lw_ch_10}). However, the MSE rate of increase decreases as we raise $w$. From visual inspection of the $\lambda$ profiles it appeared that $w \ge 20$ grids can support transition events at all values of $p$ and indeed we see roughly linear increases of MSE for $w=20,30,40$ grids. Thus, it seems that MSE is a good approximation of a grid's ability to support CA transition events: in the context of the crosshatching degeneration, a linear increase in MSE as $p$ increases is indicative of such capability. 
+}
+\label{fig:ch_mse}
+\end{figure}
+
+\section{Summary}
+
+Building upon the work done by \citeauthor{wo90}, we utilize $\lambda$ to parameterize the CA space and entropy to measure a CA system's complexity. We have seen the capacity for complex CA behavior across various irregular $N=5$ grids, despite the absence of periodic boundary conditions. We have also seen CA systems perform adequately even when exposed to imperfect, deteriorated grids. Through our quantitative analysis, we have also established MSE as a good approximation measure of a CA system's ability to support critical behavior on spatially irregular grids.
+
+Now that we have seen how cellular automata respond to spatial irregularity, the next step would be to pinpoint specific characteristics that can impact a CA's ability to perform computation. Specifically, what are the conditions that render grids incapable of supporting complex behavior? In the instances we have examined, spatial irregularity has the potential to hinder information transfer across the grid space, which we saw in both our generator point and crosshatching experiments. The crosshatching experiments also revealed the importance of having contiguous subregions within the grid, as we saw robust critical behavior on grids with sufficiently wide crosshatches, even when regions of the grid were largely disconnected from one another. We speculate that spatial irregularity also impacts the ability of a CA system to store information; long lasting coherent structures, such as oscillators in GoL require space to ``take root'' within the grid in order to facilitate complex behavior. We have made a first step in investigating the impact of spatial irregularity on cellular automata function, and future work will look towards designing experiments and metrics that will consider these questions concerning the foundations of CA computation with more precision. 
 
 %What are the conditions that render Grids incapable of supporting complex computation? Information transfer is important, but there also appear to be other factors (look to generator point degeneration and then the crosshatching degeneration).
 
@@ -1450,6 +1648,7 @@ Crosshatching degeneration is applied to our stomatal VQuad grid with crosshatch
 \item adaptation of $\gamma$ parameter to irregular 2D grids
 \item power law work
 \item attractor basin work?
+\item ways to parameterize the critical region, to traverse it in greater detail
 
 \end{itemize}
 
