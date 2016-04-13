@@ -1,6 +1,6 @@
-\documentclass[a4paper,11pt]{report}
+\documentclass[a4paper,11pt,twoside]{report}
 \usepackage{amsmath,amsfonts,amsthm,amssymb,amscd}
-\usepackage[top=1in, bottom=1in, left=1in, right=1in] {geometry}
+\usepackage[top=1in, bottom=1in, left=1.5in, right=1in] {geometry}
 \usepackage[numbers]{natbib}
 \usepackage{enumitem}
 \usepackage{setspace}
@@ -677,7 +677,7 @@ Another goal is to investigate CA behavior at the boundary of the grid. Typical 
 \end{figure}
 
 \section{Lifetime to Stability and Ash Density}
-
+\label{ch4:lifetime}
 In order to locate where interesting behavior may occur in Penrose Life, we begin by examining the full range of \textit{initial soup densities} (percentage of ON cells in the starting configuration) from $d=0.01$ to $d=0.99$, measuring both \textit{lifetime to stability} (the number of timesteps a given configuration takes to stabilize) and final \textit{ash density} (the percentage of the grid in a stable state).
 
 \subsection*{Experimental Setup}
@@ -1153,7 +1153,7 @@ Our experiments build off work by \citeauthor{wo90} that specifically examine $K
 
 The \textit{table walk-through} method for generating transition tables begins with a $\Delta$ transition function that has $\lambda = 0$. Recalling the definition of $\lambda$ (Appendix~\ref{appA:lambda}), $\lambda=0$ indicates that every rule in $\Delta$ maps to the quiescent state $s_q$. The $\Delta$ table is then \textit{incremented} to a higher $\lambda$ value by randomly replacing some of the transitions to $s_q$ with transitions to the other possible states, uniformly chosen~\cite{la90}. This table generation method has the effect of modifying the ``same'' table, allowing us to track CA behavior for individual runs of CA simulation. The Langton-Wootters Profile generated from the table walk-through method is shown in Figure~\ref{fig:lw_profile_walk}.
 
-The \textit{random table} method for generating transition tables utilizes $\lambda$ as a sampling probability. A $\Delta$ table entry is mapped to the quiescent state with probability $1 - \lambda$, while with probability $\lambda$ a non-quiescent state is chosen uniformly from the other possible states~\cite{la90}. The Langton-Wootters Profile generated from the random table method is pictured in Figure~\ref{fig:lw_profile_rand}. Also note that all $\Delta$ transition tables possess \textit{planar isotropy} and \textit{strong quiescence} as detailed in Chapter~\ref{subsec:ch3_lamb}.
+The \textit{random table} method for generating transition tables utilizes $\lambda$ as a sampling probability. A $\Delta$ table entry is mapped to the quiescent state with probability $1 - \lambda$, while a non-quiescent state is chosen uniformly from the other possible states with probability $\lambda$~\cite{la90}. The Langton-Wootters Profile generated from the random table method is pictured in Figure~\ref{fig:lw_profile_rand}. Also note that all $\Delta$ transition tables possess \textit{planar isotropy} and \textit{strong quiescence} as detailed in Chapter~\ref{subsec:ch3_lamb}.
 
 Entropy is calculated using the equations shown in Appendix~\ref{appA:entrop}. However, entropy calculations are made only for the asymptotic behavior of a given CA simulation: each CA simulation is run for 1,000 time steps, with entropy only measured after time step 500. So if a particular CA run has a lifetime of less than 500, its entropy value will be 0. This manner of calculating asymptotic entropy leads to numerous entropy measurements of 0, as pictured in both versions of the Langton-Wootters Profile. Also note that for $K=8, N=5$ CA, the maximum entropy is 3 with this maximum value occurring with a $\lambda$ value of 0.875 (Appendix~\ref{appB:max_H}). Thus, all experiments with $K=8, N=5$ CA consider a range of $\lambda$ values from $\lambda = 0.0$ to $\lambda = 0.88$. 
 
@@ -1172,7 +1172,7 @@ Entropy is calculated using the equations shown in Appendix~\ref{appA:entrop}. H
   \label{fig:lw_profile_rand}
   \end{subfigure}
 \caption[The Langton-Wootters Profile]{
-  Different forms of the Langton-Wootters Profile. Figure~\ref{fig:lw_profile_walk} shows 50 individual runs of the table-walk-through method of varying $\lambda$. Figure~\ref{fig:lw_profile_rand} shows both a scatter plot of data points collected through the random-table method of varying $\lambda$ and the theoretical Langton-Wootters Profile as predicted by mean-field theory (Appendix~\ref{appA:MFT}). Note how both plots produce the same envelope Plots adapted from both \citeauthor{la90} and \citeauthor{wo90}~\cite{la90,wo90}.
+  Different forms of the Langton-Wootters Profile. Figure~\ref{fig:lw_profile_walk} shows 50 individual runs of the table-walk-through method of varying $\lambda$. Figure~\ref{fig:lw_profile_rand} shows both a scatter plot of data points collected through the random-table method of varying $\lambda$ and the theoretical Langton-Wootters Profile as predicted by mean-field theory (Appendix~\ref{appA:MFT}). Note how both plots produce the same envelope of data points. Plots adapted from both \citeauthor{la90} and \citeauthor{wo90}~\cite{la90,wo90}.
 }
 \label{fig:lw_profile}
 \end{figure}
@@ -1232,7 +1232,7 @@ An illustration of the Voronoi representation of the stomatal array from Figure~
 
 The LW-Profiles for our Poisson Disk and Stomatal Voronoi Quad grids are pictured in Figure~\ref{fig:vor_lw_profile} and Figure~\ref{fig:stoma_lw_profile} respectively. In both cases, despite the irregularity in the cell orientation and the non-periodic boundary conditions, we see a remarkably similar shape in the LW-Profile for the Voronoi Quad grids. Examination of Figures \ref{fig:vor_lw_run} and \ref{fig:stoma_lw_run} show all of the individual CA runs experiencing a significant jump in entropy values at some point, evidence of a transition event. The corresponding scatter plots (Figures \ref{fig:vor_lw_scatter} and \ref{fig:stoma_lw_scatter}) of these graphs show that the transition gap in $0 \le H \le 0.84$ is also sparsely populated. There appear to be slightly more data points found in the gap for the stoma grid scatter plot compared to the Poisson Disk grid plot; we speculate that the size of the grid may have an influence on a CA's ability to compute, and the Poisson Disk grid is significantly larger than the stomatal grid. 
 
-LW-Profiles for the Penrose tilings are pictured in Figure~\ref{fig:penrose_lw_profile}. Though the overall shape of the curves are still in line with the baseline profile, we see some small deviations in the LW-Profile for Rhomb tilings, shown in Figure~\ref{fig:crh_lw_profile}. First, we see that the transition gap contains a fair amount of data points, spanning a much larger range of $\lambda$ than any of the other grids we have examined with points in the gap found at $\lambda < 0.2$. There is also more variance in the data points above the transition gap, producing a slightly looser convergence as $\lambda$ increases. These discrepancies are surprising given our Penrose Life experiments in Chapter~\ref{ch:penrose} showing that the Rhomb tilings supported longer living structures, which suggests that the grids would be better suited for supporting complex behavior. Thus, there is a need for a way to quantify how these graphs may differ from one another, as visual inspection is not an adequate measure of such differences. Overall however, we see entropy profile behavior equivalent to those seen in the baseline experiments as we vary $\lambda$ across all of these irregular grids, suggesting a functional equivalence between irregular, non-periodic quadrilateral grids and their regular, periodic square counterparts. With the preservation of both the overall shape and a well-defined transition gap of the LW-Profiles we have examined, it appears that complex behavior can be supported in all of these irregular quadrilateral grids.
+LW-Profiles for the Penrose tilings are pictured in Figure~\ref{fig:penrose_lw_profile}. Though the overall shape of the curves are still in line with the baseline profile, we see some small deviations in the LW-Profile for Rhomb tilings, shown in Figure~\ref{fig:crh_lw_profile}. First, we see that the transition gap contains a fair amount of data points, spanning a much larger range of $\lambda$ than any of the other grids we have examined with points in the gap found at $\lambda < 0.2$. There is also more variance in the data points above the transition gap, producing a slightly looser convergence of entropy as $\lambda$ increases. These discrepancies are surprising given our Penrose Life experiments in Chapter~\ref{ch:penrose} showing that the Rhomb tilings supported longer living structures, which suggests that the grids would be better suited for supporting complex behavior. Thus, there is a need for a way to quantify how these graphs may differ from one another, as visual inspection is not an adequate measure of such differences. Overall however, we see entropy profile behavior equivalent to those seen in the baseline experiments as we vary $\lambda$ across all of these irregular grids, suggesting a functional equivalence between irregular, non-periodic quadrilateral grids and their regular, periodic square counterparts. With the preservation of both the overall shape and a well-defined transition gap of the LW-Profiles we have examined, it appears that complex behavior can be supported in all of these irregular quadrilateral grids.
 
 \begin{figure}[htp]
 \centering
@@ -1299,7 +1299,7 @@ LW-Profiles for the Penrose tilings are pictured in Figure~\ref{fig:penrose_lw_p
 Now that some equivalence in CA behavior has been established for our irregular grids, we want to examine how these grids respond to degradation. We expose CA systems to other forms of spatial irregularity through introducing ``internal'' boundaries by removing cells and through isolating local regions by reducing neighborhood connectivity. Our goal is to examine how robust cellular automata can be when facing spatial deterioration, another form of environmental noise (see Chapter~\ref{sec:Robust}) natural systems have to combat.
 
 \subsection{Generator Point Degeneration}
-
+\label{subsec:ch6_gen_pt_degen}
 \subsubsection*{Experimental Setup}
 We introduce internal boundary conditions by removing cells through the generator point removal technique outlined in Chapter~\ref{subsec:gen_pt_rem}. We apply degeneration percentages of $0.05,0.1, 0.15, 0.20$ to our stomatal Voronoi Quad grid, seen in Figure~\ref{fig:stoma_gen_pt_degen}. We then perform the same $\lambda$ experiments from the previous section, running simulations of $\lambda=0.01...0.87$ with $t_{max} = 500$ and the asymptotic threshold at $t=250$ for 100 total trials. 
 
@@ -1330,7 +1330,7 @@ We introduce internal boundary conditions by removing cells through the generato
   \end{subfigure}
 
 \caption[Stomatal Generator Point Degeneration]{
-  Representative degenerated Stomatal Grids through generator point removal. Notice how the generator point removal method causes relatively large areas of cells to be erased; there are no single cell removals from this technique. With randomized generator point deletion, it is difficult for regions of the grid to be completely isolated. Even with a significant number of generator points removed, the remaining cells shown in Figure~\ref{fig:stoma_gen_pt_20} still form a completely connected grid.
+  Representative degenerated Stomatal Grids through generator point removal. Notice how the generator point removal method causes relatively large areas of cells to be erased; there are no single cell removals as a result of this degeneration technique. With randomized generator point deletion, it is difficult for regions of the grid to be completely isolated. Even with a significant number of generator points removed, the remaining cells shown in Figure~\ref{fig:stoma_gen_pt_20} still form a completely connected grid.
 }
 \label{fig:stoma_gen_pt_degen}
 \end{figure}
@@ -1380,7 +1380,7 @@ The resulting Langton-Wootters Profiles are pictured in Figure~\ref{fig:lw_gen_p
 In the previous section, we degraded a CA grid by randomly deleting cells from it. In order to more tightly control how spatial degeneration occurred throughout the grid, we utilize the crosshatching degeneration method described in Chapter~\ref{subsec:ch_degen}. With this technique, we can vary how isolated local regions are within the grid without having to explicitly remove cells. This allows us to investigate the role of both overall grid size and connectivity in supporting complex CA behavior.
 
 \subsubsection*{Experimental Setup}
-Crosshatching degeneration is applied to our stomatal VQuad grid with crosshatch widths of $w=10,15,20,25,30$. The edge removal probability $p$ ranges from $p=0.05$ to $p=1.0$, in increments of $0.05$. We degenerate the grid for each $\lambda$ trial, producing new crosshatchings for every run. Some representative images of grids are shown in Figures \ref{fig:ch_w10_grid}, \ref{fig:ch_w20_grid}, and \ref{fig:ch_w30_grid}. Otherwise, $\lambda$ experiments are run in an identical manner as the previous two sections, with 100 trials varying $\lambda$ from $\lambda=0.01...0.88$.
+Crosshatching degeneration is applied to our stomatal VQuad grid with crosshatch widths of $w=10,15,20,25,30$. The edge removal probability $p$ ranges from $p=0.05$ to $p=1.0$, in increments of $0.05$. We degenerate the grid for each $\lambda$ trial, producing new crosshatchings for every run, with examples in Figures \ref{fig:ch_w10_grid}, \ref{fig:ch_w20_grid}, and \ref{fig:ch_w30_grid}. Otherwise, $\lambda$ experiments are run in an identical manner as the previous two sections, with 100 trials varying $\lambda$ from $\lambda=0.01...0.88$.
 
 \begin{figure}[htp]
 \centering
@@ -1490,7 +1490,7 @@ Crosshatching degeneration is applied to our stomatal VQuad grid with crosshatch
 
 \subsubsection*{Qualitative Analysis}
 
-Some representative entropy profiles are shown in Figures \ref{fig:lw_ch_10}, \ref{fig:lw_ch_20}, and \ref{fig:lw_ch_30} for $w=10,20,30$, respectively. In the $w=10$ case, we see massive degeneration of the structure of the grid in the $p=0.75$ (Figure~\ref{fig:lw_w10_p75}) and $p=1.0$ (Figure~\ref{fig:lw_w10_p100}) graphs, with a loss of both the convergence of entropy values as well as the well-defined transition gap; if we look back to Figure~\ref{fig:ch_w10_grid}, we see that at $p=0.75$ and $p=1.0$ there is widespread edge removal across the entire grid with very little contiguous grid regions. This sort of damage is too much for a CA to overcome, and critical transitions are not observed on these grids. 
+Representative entropy profiles are shown in Figures \ref{fig:lw_ch_10}, \ref{fig:lw_ch_20}, and \ref{fig:lw_ch_30} for $w=10,20,30$, respectively. In the $w=10$ case, we see massive degeneration of the structure of the grid in the $p=0.75$ (Figure~\ref{fig:lw_w10_p75}) and $p=1.0$ (Figure~\ref{fig:lw_w10_p100}) graphs, with a loss of both the convergence of entropy values as well as the well-defined transition gap; if we look back to Figure~\ref{fig:ch_w10_grid}, we see that at $p=0.75$ and $p=1.0$ there is widespread edge removal across the entire grid with very little contiguous grid regions. This sort of damage is too much for a CA to overcome, and critical transitions are not observed on these grids. 
 
 As the width of the crosshatching increases however, we see much more robust behavior. When $w=20$, we see preservation of the baseline LW-Profile structure across all $p$ values, with only a slight weakening of convergence when $w=1.0$ (Figure~\ref{fig:lw_w20_p100}). Again the entropy profile structure is maintained when $w=30$, with tight convergence even when $w=1.0$. As the crosshatching width increases, there are fewer edges being removed from the grid, and larger contiguous subregions of the grid are preserved. Thus, we expect CA behavior to be more robust to grid degradation as the crosshatching width increases. Though we have evaluated these results through visual inspection of the LW-Profiles, we will explore a more quantitative manner of assessing CA behavior on damaged grids.
 
@@ -1634,6 +1634,38 @@ Now that we have seen how cellular automata respond to spatial irregularity, the
 \chapter{Future Work}
 \label{ch:future_work}
 
+Throughout the previous chapters, we have been building up a basis of knowledge on how spatial irregularity impacts complex CA behavior. Our exploratory experiments have suggested that CA systems are relatively robust to nonuniform spatial environments and can even perform adequately on degraded or damaged grids. In some instances, we see that spatial irregularity even facilitates complex behavior. However, all of these conclusions are made tentatively as we have only examined a few specific CA domains, utilizing metrics that are considered to capture broad, general characteristics of CA function rather than pinpointing specifics of \textit{critical} CA function. Thus, we will re-evaluate our results and consider some future directions that will expand on the work we have done.
+
+\section{Evaluation and Critique of Our Results}
+
+Though our experiments on Penrose Life, the Majority Task and $\lambda$ have all pointed to the idea that CA systems can operate on nonuniform grids. However, as we have noted in our discussions, there could be other properties that impact CA behavior that change alongside the spatial noise we introduce. The most prominent of such properties that we need to be aware of is neighborhood size. Previous work~\cite{fl01} has suggested that the connectivity of a given cell is a major driving factor for variations on CA system behavior, and the impact of irregular cells could simply be due to the introduction of variable neighborhood sizes, not because of spatial non-uniformity itself. We see a similar sort of effect in the experiments we have run ourselves, as Penrose Life on Thin/Thick Rhomb grids had higher average lifetimes than on Kite/Dart grids (Chapter~\ref{ch4:lifetime}) but also had higher average neighborhood sizes (Chapter~\ref{sec:ch4_neighbors}) when using a generalized Moore neighborhood stencil. It is unclear what is impacting the Penrose Life average lifetimes in this situation, and when we consider Rhombs and Kites/Darts for $\lambda$ experiments with a von Neumman neighborhood (producing the same sized neighborhoods), we see that Kite/Dart grids perhaps support complex behavior better than Rhomb grids (Figure~\ref{fig:penrose_lw_profile}). Thus we need to carefully control the parameters of our experiments to ensure that connectivity and neighborhood size do not skew our results. Performing more experiments on specific classes of CAs, like our $\lambda$ investigations, where the neighborhood size is fixed is a good way to both parameterize the CA space and reduce any potential connectivity effects.
+
+Another characteristic of irregular grids we have to consider carefully is the grid boundary condition. Though traditional CA systems have the advantage of complete neighborhoods at every cell due to periodic square lattice boundaries, natural dynamic systems have to deal with the fact that some neighborhoods will be incomplete at the borders since they operate in a bounded space. We have seen that despite this limitation, CA systems on irregular grids can still perform comparably to their counterparts on regular, periodic grids.  We speculate that boundaries could act as regions of ``stability'' where neighborhood interactions are simpler and more consistent than within central regions of the grid: for example, we often saw long-living Penrose Life structures utilizing boundary cells to their advantage (Chapter~\ref{sec:ch4_single_run}). Then again, it is not clear how the boundary impacts a CA system's behavior in other domains, as majority task performance decreased on regular but non-periodic grids (Figure~\ref{fig:lm_reg_nonper}) in comparison to periodic grids but irregular non-periodic grids perform comparably to the regular, periodic baseline case (Figure~\ref{fing:lm_ireg}). Internal boundary conditions must also be considered, as they are introduced when grids are spatially degraded, such as when cells are removed from the grid (Chapter~\ref{subsec:ch6_gen_pt_degen}). Ultimately, boundary conditions are unavoidable when considering spatial irregularities in natural dynamic systems and appear to play an important role in the type of CA behavior a space can support, so future experiments should isolate and attempt to distill the specific effects of a grid's boundary.
+
+
+
+\section{Measuring Information Transfer}
+As we discussed in Chapter~\ref{ch:penrose}, spatial irregularity can have a large impact on information transfer across the grid space. The ability to transfer information is a requisite property for supporting computation in a CA system. Though we have made some indirect observations on information transfer in our experiments by looking at Penrose Life lifetimes and \textit{asymptotic} entropy, more direct measurements of information transfer should be made. Some spatial properties to consider would be the \textit{connectedness} of the grid as well as the \textit{geodesic distance}, or shortest path between two cells on the grid. In some of the degenerated grids we have considered in our $\lambda$ experiments, we suspect that one of the main factors that causes the deterioration of the CA's $\lambda$ profile is due to increased difficulty in information transfer. In particular, it would be interesting to measure the geodesic distances for the grids in Figure~\ref{fig:genpt_degen} to see if there are correlations between the average geodesic distances for all pairs of cells and the degree of degradation seen in their respective $\lambda$ profiles.
+
+Another factor to consider is the \textit{speed} at which information travels across the grid space. Though used primarily for measuring the ``variance'' of CA behavior, the $\gamma$ parameter (Chapter~\ref{subsec:metrics}, Appendix~\ref{appA:gamma}) can also be utilized to quantify the speed at which \textit{difference patterns} travel across the space. Adapting $\gamma$ to two-dimensional, irregular grids could not only help parameterize the CA space we are considering but also characterize how fast particles travel within the space. Measuring the speed of information transfer is particularly important for irregular grids, as though the ``speed of light,'' or maximum information transfer speed, is constant across a regular CA grid, due to variability in spatial orientation and neighborhood sizes it may not be constant on irregular grids.
+
+\section{Criticality under Microscope: Other CA Metrics to Consider}
+
+
+
+\begin{itemize}
+\item MSE as a metric, first approximation
+\item Power law
+\item Attractor Basin Work
+\end{itemize}
+
+\section{Consideration of Other Dynamical Systems}
+\begin{itemize}
+\item random nets, boolean networks?
+\item continuous rule tables
+\end{itemize}
+
+Outline
 \begin{itemize}
 
 \item measurements of ``speed of light'' across degraded grids
@@ -1654,6 +1686,11 @@ Now that we have seen how cellular automata respond to spatial irregularity, the
 
 \chapter{Conclusion}
 \label{ch:conclusion}
+
+\begin{itemize}
+\item Long Term Future: Finding ways to embed computational systems into irregular spatial environments
+\end{itemize}
+
 
 \begin{appendices}
 
@@ -1726,9 +1763,13 @@ In order to estimate $\gamma$, first calculate $\lambda$ using the cellular auto
 \gamma = \frac{(2r+2)\lambda - (2r + 2)\lambda^2 - 1}{\lambda(1-\lambda)}
 \end{equation}
 
-\pagebreak
+We can also make a rough first approximation of entropy $H$ using simple mean theory. For a $K=k$ CA at a given $\lambda$ value, we estimate $H$ as:
 
-\citeauthor{wo90} utilize mean-field theory to estimate the entropy $H$ of a 2D cellular automata with $K=8$ and $N=5$~\cite{wo90}. Let $v$ be the density of the quiescent state $s_q$ in the spatial configuration, so $v=1$ would indicate a configuration of all $s_q$. $K=8$, $N=5$ Cellular automata in their steady state will satisfy the following equation:
+\begin{equation}
+H_{m.f.} = - (1- \lambda) \log (1-\lambda) - \lambda \log \frac{\lambda}{k-1}nnnnnn
+\end{equation}
+
+\citeauthor{wo90} utilize mean-field theory to make a more detailed estimate of the entropy $H$ of 2D cellular automata with $K=8$ and $N=5$~\cite{wo90}. Let $v$ be the density of the quiescent state $s_q$ in the spatial configuration, so $v=1$ would indicate a configuration of all $s_q$. $K=8$, $N=5$ Cellular automata in their steady state will satisfy the following equation:
 
 \begin{equation}
 v = v^5 + (1 - v^5)(1- \lambda)
