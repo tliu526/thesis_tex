@@ -7,6 +7,8 @@
 \usepackage{courier}
 \usepackage{subcaption}
 
+\usepackage{longtable}
+
 %For inserting sequences of images
 %\usepackage{python}
 \usepackage{verbatim}
@@ -80,18 +82,19 @@
 
 \title{Computation in the Wild: Reconsidering Dynamic Systems in Light of Irregularity}
 %TODO Spatial Irregularity?
-
 \author{Tony Liu}
 \maketitle
-\listoffigures
+\pagenumbering{roman}
 % for chapter headings
 
 \tableofcontents
-
+\listoffigures
 \chapter*{Abstract}
 
+Dynamic, spatially-oriented systems found in nature such as plant cell arrays or ant colonies can produce complex behavior without centralized coordination or control. Instead, they communicate locally, with these local interactions producing emergent behavior globally across the entire system. The essence of these decentralized systems can be captured utilizing cellular automata (CA) modeling, and such models are utilized for investigating and simulating such natural systems. However, CA models assume spatial regularity and structure, which are certainly not present in natural systems. In fact, natural systems are inherently robust to spatial irregularities and environmental noise. In this work, we relax the assumption of spatial regularity when considering CA systems in order to investigate the conditions in which complex behavior can emerge in noisy, irregular natural systems.
 
 \chapter{Introduction}
+\pagenumbering{arabic}
 \label{ch:Intro}
 Dynamic natural systems have the ability to perform complex tasks that resemble computation, often without the aid of a central processing unit. In particular, spatial systems that are only locally connected, such as plant cell arrays or single-agent populations, can produce emergent, globally-coordinated behavior~\cite{bi07, mo07}. These systems are of particular interest because of their massive parallelism and fault tolerance within noisy, imperfect environments~\cite{si99}. Decentralized dynamic systems can be described and modeled using cellular automata (CA) because of CA's ability to support complex behavior arising from simple components and strictly local connectivity~\cite{mi96}. The goal with CA models is to able to examine how and under what conditions global, distributed computation emerges in such systems.
 
@@ -466,9 +469,61 @@ Grid Generators will be reviewed in more detail in Section \ref{sec:GridGen}, wh
 
 \subsection{Input/Output Files and Running Our System}
 
-We have a standardized format for storing and reading in grid configurations, which allows us to easily pause and restore CA simulations as well as save and transfer them across different machines. A representative input grid file can be found in Appendix \ref{appB:grid_in}. The visual representation of our grids are built by creating graph descriptions for \textbf{neato}, a graph layout program part of the Graphviz drawing package~\cite{el01}. Images of our neato grid representations can be found in Section \ref{sec:GridGen}. Measured statistics are exported to .csv files and analyzed using Python with packages from the SciPy ecosystem~\cite{jo14}.
+We have a standardized format for storing and reading in grid configurations, which allows us to easily pause and restore CA simulations as well as save and transfer them across different machines. A representative input grid file can be found in Figure~\ref{fig:gridfile}. The visual representation of our grids are built by creating graph descriptions for \textbf{neato}, a graph layout program part of the Graphviz drawing package~\cite{el01}. Images of our neato grid representations can be found in Section \ref{sec:GridGen}. Measured statistics are exported to .csv files and analyzed using Python with packages from the SciPy ecosystem~\cite{jo14}.
 
 We utilize the GNU C library package \texttt{getopt} to pass Unix-style command line arguments to our system, allowing experiments to be easily scripted and batched across multiple machines.
+
+\begin{figure}[htp]
+\centering
+%TODO figure out best way to represent input grid file: straight text or picture?
+%Embed code
+%\includegraphics[width=1.0\textwidth]{gen_pt_degen_7}
+\begin{verbatim}
+VQuad -110 110 -90 90
+GenPoints 984
+Label Point Neighbors
+gp000 -96.1844,17.7866 gp001 gp003
+gp001 -92.5702,23.8358 gp000 gp003
+gp002 -88.9926,16.5559 gp003 gp004 gp022 gp043
+gp003 -90.6002,19.8816 gp000 gp001 gp002 gp022
+gp004 -88.1554,12.7896 gp002 gp005 gp033 gp043
+gp005 -89.796,11.249 gp004 gp033
+
+...
+
+Vertices 1066
+p0000 -101.262,15.4959
+p0001 -92.6163,15.4566
+p0002 -91.1069,20.0772
+p0003 -95.5698,22.0034
+p0004 -89.1213,24.5139
+p0005 -94.0335,27.5945
+
+...
+
+Edges 2049
+e0000 p0000 p0003
+e0001 p0000 p0001
+e0002 p0003 p0002
+e0003 p0001 p0002
+e0004 p0003 p0005
+e0005 p0005 p0004
+
+...
+
+Faces 984
+f000 e0000 e0001 e0002 e0003
+f001 e0004 e0002 e0005 e0006
+f002 e0007 e0008 e0009 e0010
+f003 e0003 e0007 e0006 e0011
+f004 e0012 e0008 e0013 e0014
+f005 e0015 e0012 e0016 e0017
+\end{verbatim}
+\caption[Representative Grid Data File]{
+  A representative grid data file for our CA simulation system. The first line gives the grid type and the dimensions of the graph (minimum x, maximum x, minimum y, maximum y). We then separate each section of primitives (GenPoints, Vertices, Edges, Faces) with a label and the number of primitives. 
+}
+\label{fig:gridfile}
+\end{figure}
 
 \section{Grid Generation}
 \label{sec:GridGen}
@@ -477,8 +532,6 @@ In this section we'll describe the algorithms utilized to generate the various g
 
 \subsection{Penrose Tilings}
 To generate Penrose Tilings and Penrose-connected graphs, we use inflation processes to recursively generate the tiling. \citeauthor{ro71}'s triangle recursive decomposition technique is utilized to draw both kite/dart and thin/thick rhomb tilings, except full tiles are drawn instead of individual triangles~\cite{ro71}. Though drawing full tiles will likely result in tiles being considered and drawn multiple times, we avoid this by marking faces as they are drawn, only keeping a single copy of each face. As in all our grid generation programs, we track geometric primitives (\texttt{Point}, \texttt{Edge}, \texttt{Face}) to make generating our standard grid input file straightforward.
-
-TODO more detail?
 
 \subsection{Delaunay Triangulations and Voronoi Diagrams}
 The goal with building grids using Voronoi diagrams is to produce irregular grids that still respect Euclidean distance, as discussed in Section \ref{subsec:ModelVoronoiRep}. Given a set of \textit{generator points} $\{p_1, ..., p_n\}$ in the plane, a Voronoi polygon $V_k$ corresponding to a generator point $p_k$ consists of all points whose distance to $p_k$ is less than its distance to any other generator point. Thus, we can partition the plane into Voronoi polygons that correspond to every generator point, producing a \textit{Voronoi Diagram}. These polygons will serve as the cells in our CA simulations. 
@@ -781,11 +834,9 @@ We also collected data for Lifetime to Stability and Ash Density graphs for Rhom
 
 \section{Single Run Analysis}
 \label{sec:ch4_single_run}
-TODO best way to insert sequence of pictures?
-
 %TODO: Circ Kite/Dart longest run: initial percentage=28, seed=92, lifetime=169
 
-The longest run we observed in our Kite/Dart simulations began with an initial soup density of $d=0.22$ and had an active lifetime of 173 timesteps before periodic behavior set in. We graph the active density of ON cells in the tiling against time in Figure \ref{fig:ckd_single}. As seen in this graph, the active density of the Penrose quickly falls to near typical ash density levels ($d \approx 0.03$) and stays close to constant over a majority of its lifetime. We hypothesize that this behavior would be indicative of ash stabilizing relatively quickly with a small glider-like structure being primarily responsible for the long lifetime. Looking at the actual simulation, this seems to be the case, with an amorphous moving structure propagating in the upper left corner for majority of the simulation as seen in Figure TODO. Otherwise, the ash settles relatively quickly, with a \textit{plinker} (coined by \citeauthor{hi05}) period 2 oscillator present on the right side of the tiling.
+The longest run we observed in our Kite/Dart simulations began with an initial soup density of $d=0.22$ and had an active lifetime of 173 timesteps before periodic behavior set in. We graph the active density of ON cells in the tiling against time in Figure \ref{fig:ckd_single}. As seen in this graph, the active density of the Penrose quickly falls to near typical ash density levels ($d \approx 0.03$) and stays close to constant over a majority of its lifetime. We hypothesize that this behavior would be indicative of ash stabilizing relatively quickly with a small glider-like structure being primarily responsible for the long lifetime. Looking at the actual simulation, this seems to be the case, with an amorphous moving structure propagating in the upper left corner for majority of the simulation. Otherwise, the ash is largely settled, with a \textit{plinker} (coined by \citeauthor{hi05}) period 2 oscillator present on the right side of the tiling (Figure.
 
 \begin{figure}[htp]
 \centering
@@ -796,7 +847,101 @@ The longest run we observed in our Kite/Dart simulations began with an initial s
 \label{fig:ckd_single}
 \end{figure}
 
-The longest run observed in our Rhomb simulations began with an initial soup density of $d=0.26$ had an active lifetime of 666 timesteps. Its density is plotted against time in Figure \ref{fig:crh_single}. Unlike the Kite/Dart single run, there are some fluctuations in the active density of ON cells in the grid throughout the run. Upon visual inspection of the run (seen in Figure TODO), there is spreading activation across the grid when moving structures collide with stable structures or oscillators, resulting in the spikes in density such as the one beginning around timestep 200.
+The longest run observed in our Rhomb simulations began with an initial soup density of $d=0.26$ had an active lifetime of 666 timesteps. Its density is plotted against time in Figure \ref{fig:crh_single}. Unlike the Kite/Dart single run, there are some fluctuations in the active density of ON cells in the grid throughout the run. Upon visual inspection of the run (seen in Figure~\ref{fig:crh_666_seq}), there is spreading activation across the grid when moving structures collide with stable structures or oscillators, resulting in the spikes in density such as the one beginning around timestep 200.
+
+\begin{figure}[htp]
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_190}
+\centering
+\caption{t=190}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_191}
+\centering
+\caption{t=191}
+\end{subfigure}
+
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_192}
+\centering
+\caption{t=192}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_193}
+\centering
+\caption{t=193}
+\end{subfigure}
+
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_194}
+\centering
+\caption{t=194}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_195}
+\centering
+\caption{t=195}
+\end{subfigure}
+\end{figure}
+
+\begin{figure}[htp]
+\ContinuedFloat
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_196}
+\centering
+\caption{t=196}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_197}
+\centering
+\caption{t=197}
+\end{subfigure}
+
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_198}
+\centering
+\caption{t=198}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_199}
+\centering
+\caption{t=199}
+\end{subfigure}
+
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_200}
+\centering
+\caption{t=200}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_201}
+\centering
+\caption{t=201}
+\end{subfigure}
+\end{figure}
+
+\begin{figure}[htp]
+\ContinuedFloat
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_202}
+\centering
+\caption{t=202}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_203}
+\centering
+\caption{t=203}
+\end{subfigure}
+
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_204}
+\centering
+\caption{t=204}
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.5\textwidth}\includegraphics[width=\textwidth]{ch4_figs/crh_long/crh_long_205}
+\centering
+\caption{t=205}
+\end{subfigure}
+
+\caption[Rhomb Single Run Sequence]{
+  Timesteps 190-205 of the Rhomb single run sequence with initial density $d=0.26$. Note the sudden proliferation of ON states in the upper left when the moving structure collides and interacts with the border. This spike in activity can be seen in the corresponding lifetime graph (Figure~\ref{fig:crh_single}). 
+}
+\label{fig:crh_666_seq}
+
+\end{figure}
 
 \begin{figure}[htp]
 \centering
@@ -936,7 +1081,18 @@ Ash density scatter plots for our subregion Kite/Dart and Rhomb tilings are pict
 \section{Potential for Penrose Gliders}
 With the ash density results shown for subregion Rhomb tilings along with the significantly higher average lifetime for Rhomb tilings in general, there is some potential for gliders to be found in Penrose Rhomb Life. Unfortunately, like \citeauthor{ow10} who also searched for gliders in Penrose tilings~\cite{ow10}, the only coherent structures we have detected in either tiling are oscillators. It appears that the aperiodic nature of the Penrose tilings severely limits the ability for coherent structures to travel beyond a particular localized region within Penrose Life. 
 
-However, if we move away from the Game of Life rules, there is potential for coherent moving structures to exist on Penrose tilings. \citeauthor{go12} created a 4-state CA rule table that supports a coherent glider structure on both Kite/Dart and Rhomb tilings (Figure TODO)~\cite{go12}. This discovery illustrates that aperiodicity does not completely limit the ability for a CA to transfer information across a grid space; in fact it has been conjectured that a CA rule table can be created for \textit{any} quadrilateral tiling, provided that the CA has enough possible states~\cite{mu16}. Further analysis of \citeauthor{go12}'s CA rule table will be conducted in Chapter~\ref{ch:lambda_degen}.
+However, if we move away from the Game of Life rules, there is potential for coherent moving structures to exist on Penrose tilings. \citeauthor{go12} created a 4-state CA rule table that supports a coherent glider structure on both Kite/Dart and Rhomb tilings (Figure~\ref{fig:penrose_glider})~\cite{go12}. This discovery illustrates that aperiodicity does not completely limit the ability for a CA to transfer information across a grid space; in fact it has been conjectured that a CA rule table can be created for \textit{any} quadrilateral tiling, provided that the CA has enough possible states~\cite{mu16}. 
+%TODOOOO Further analysis of \citeauthor{go12}'s CA rule table will be conducted in Chapter~\ref{ch:lambda_degen}.
+
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=0.6\textwidth]{ch4_figs/go12_fig1_penrose_glider}
+\caption[Penrose Glider]{
+  An illustration of the path of the Penrose glider discovered by \citeauthor{go12}. It is a 4-state cellular automaton which produces structures that can travel along ``ribbons'' of rhombi without ever looping back to its original location. Figure from \citeauthor{go12}~\cite{go12}.
+  }
+\label{fig:penrose_glider}
+\end{figure}
 
 \iffalse
 TODO
@@ -1656,7 +1812,36 @@ Though we have examined the canonical CA space parameter $\lambda$ and devised o
 
 One measure that has been shown to be a good indicator of critical behavior is the \textit{power spectral density}, which describes the distribution of frequency components of some signal. In the case of cellular automata, the spectral density $S(f)$ is the squared sum of the Fourier transformation of a time series of cell state values~\cite{ni98}. Critical behavior in dynamic systems is often marked by $1/f$ fluctuation, where the power spectrum as a function of a frequency $f$ behaves like $1/f$. In particular, \textit{self-organized criticality} in dynamic systems, where critical state is achieved regardless of initial state conditions~\cite{ba88}, is found to correspond with such power spectra fluctuations. \citeauthor{ni98} have shown that the $1/f$ fluctuation sharply differentiates the Game of Life from rules that have similar $\lambda$ values but ultimately do not produce complex behavior~\cite{ni98}. Such power spectra behavior is also often accompanied by self-similarity and fractal structures, visual and spatial indicators of critical behavior. Thus, applying power spectra analysis to the spatially irregular grids would give us a deeper and more detailed statistical analysis of the critical region and perhaps even a greater understanding of what conditions cause critical phenomenon to emerge.
 
-Another measure that could give us insight into the internal structure of the critical region is a \textit{basin of attraction}. Since CA systems are deterministic, they follow a unique trajectory from a given initial state. Grid states have the potential to repeat, settling on an \textit{attractor cycle} that represents a particular CA's stable state. Given the CA's rule table, we can then trace backwards the states that could lead to an attractor state, until we reach a \textit{Garden of Eden} state that has no predecessor state. The connected graph that results from tracing states from the attractor back to Garden of Eden states is the basin of attraction for a particular CA system. This structure allows us to categorize the global characteristics of a CA system and can help us determine whether information processing is possible. For example, \citeauthor{wu98} utilize attractor basins to identify whether a given CA's dynamics can support glider-like structures: such attractor basins have long transient paths to the attractor cycles with relatively small periods~\cite{wu98}. Interestingly, \citeauthor{wu98} have also used attractor basin properties to \textit{automatically} classify CA systems: for example, complex CA often produce attractor basins that have an in-degree frequency that follows a power law distribution like we previously discussed. Though the attractor basin portrait of a CA is an immensely useful tool for examining CA behavior, adapting the measure to two dimensions and to irregular grids could pose a challenge, as local neighborhood configurations are now often unique and the overall state space is much larger. Still, we believe that further work in developing such generalizations of attractor basins would allow us to take a closer examination of CA critical region features that could characterize such systems beyond just average entropy.
+Another measure that could give us insight into the internal structure of the critical region is a \textit{basin of attraction}. Since CA systems are deterministic, they follow a unique trajectory from a given initial state. Grid states have the potential to repeat, settling on an \textit{attractor cycle} that represents a particular CA's stable state. Given the CA's rule table, we can then trace backwards the states that could lead to an attractor state, until we reach a \textit{Garden of Eden} state that has no predecessor state. The connected graph that results from tracing states from the attractor back to Garden of Eden states is the basin of attraction for a particular CA system. This structure allows us to categorize the global characteristics of a CA system and can help us determine whether information processing is possible. For example, \citeauthor{wu98} utilize attractor basins to identify whether a given CA's dynamics can support glider-like structures: such attractor basins have long transient paths to the attractor cycles with relatively small periods~\cite{wu98} (Figure~\ref{fig:attract_basin}). Interestingly, \citeauthor{wu98} have also used attractor basin properties to \textit{automatically} classify CA systems: for example, complex CA often produce attractor basins that have an in-degree frequency that follows a power law distribution like we previously discussed. Though the attractor basin portrait of a CA is an immensely useful tool for examining CA behavior, adapting the measure to two dimensions and to irregular grids could pose a challenge, as local neighborhood configurations are now often unique and the overall state space is much larger. Still, we believe that further work in developing such generalizations of attractor basins would allow us to take a closer examination of CA critical region features that could characterize such systems beyond just average entropy.
+
+
+\begin{figure}[htp]
+\centering
+
+\begin{subfigure}[t]{0.4\textwidth}
+  \includegraphics[width=\textwidth]{ch7_figs/wu98_fig13_ordered}
+  \caption{Ordered Attractor Basin}
+
+\end{subfigure}
+~
+\begin{subfigure}[t]{0.4\textwidth}
+  \includegraphics[width=\textwidth]{ch7_figs/wu98_fig13_chaos}
+  \caption{Chaotic Attractor Basin}
+
+\end{subfigure}
+
+\begin{subfigure}[t]{0.4\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{ch7_figs/wu98_fig13_complex}
+  \caption{Complex Attractor Basin}
+
+  \end{subfigure}
+
+\caption[Attractor Basin Portraits]{
+  Illustrations of attractor basins for ordered, chaotic, and complex 1D cellular automata. The root states are a particular CA state within an attractor cycle. The ``roots'' of the attractor basin trees are Garden of Eden states. Notice how the ordered attractor basin has a largely symmetric shape, with many branches of the tree converging in a structured manner. On the other hand, the chaotic attractor basin has long subtrees with little to no interaction between branches, indicative of the low convergence characteristic of chaotic behavior. With the complex attractor basin, we see some isolated branches but also regions of interaction between particular paths to the root. These areas of interaction correspond to glider interaction within the 1D CA. Thus, through these attractor basin portraits we can see visually how complex CAs sit on the edge between ordered and chaotic systems. Figure adapted from \citeauthor{wu98}~\cite{wu98}. 
+}
+\label{fig:attract_basin}
+\end{figure}
 
 \iffalse
 \begin{itemize}
@@ -1697,6 +1882,8 @@ Outline
 \end{itemize}
 \fi
 
+\processdelayedfloats
+
 \chapter{Conclusion}
 \label{ch:conclusion}
 From the experiments we have conducted, we have tentatively shown that CA systems are robust to spatial irregularity. It appears that features of regular grids that initially seemed crucial for supporting CA behavior such as uniform neighborhood sizes and periodic boundaries are in fact not required for supporting complex behavior. We have relaxed many of the spatial assumptions made in traditional CA systems, yet producing remarkably similar results to the regular grid case in the context of both our majority task experiments and our $\lambda$ experiments.
@@ -1721,6 +1908,8 @@ TODO insert regular grid degeneration lambda profiles into ch 6?
 \item Long Term Future: Finding ways to embed computational systems into irregular spatial environments
 \end{itemize}
 \fi
+
+
 
 \begin{appendices}
 
@@ -1821,100 +2010,21 @@ This estimate for entropy is plotted in Figure~\ref{fig:mft_lambda}.
 }
 \label{fig:mft_lambda}
 \end{figure}
+
 \processdelayedfloats
-\chapter{Supplementary Figures and Calculations}
-\section{Grid Input File Format}
-\label{appB:grid_in}
 
-\begin{figure}
-\centering
-\begin{tabular}{cccc}
-
-\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}&
-\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_1}}&
-\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_2}}&
-\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_3}}\\
-\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_4}}&
-\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_5}}&
-\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_6}}&
-\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_7}}\\
-
-%1 & 1 & 1 & 1 \\
-\iffalse
-\begin{python}
-print("\\begin{tabular}{cccc}")
-for i in range(0,5):
-	print("1 & 1 & 1 & 1 \\\\")
-  %print("\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}&")
-  %print("\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}&")   
-  %print("\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}&")
-  %print("\subcaptionbox{}{\includegraphics[width=0.2\columnwidth]{ch4_figs/crh_long/crh_long_0}}\\")
-print("\\end{tabular}")
-\end{python}
-\fi
-\end{tabular}
-\caption[Rhomb Single Run Sequence]{
-    Something here
-}
-\label{fig:crh_666_seq}
-
-\end{figure}
-
-
-\begin{figure}
-\centering
-%TODO figure out best way to represent input grid file: straight text or picture?
-%Embed code
-%\includegraphics[width=1.0\textwidth]{gen_pt_degen_7}
-\begin{verbatim}
-VQuad -110 110 -90 90
-GenPoints 984
-Label Point Neighbors
-gp000 -96.1844,17.7866 gp001 gp003
-gp001 -92.5702,23.8358 gp000 gp003
-gp002 -88.9926,16.5559 gp003 gp004 gp022 gp043
-gp003 -90.6002,19.8816 gp000 gp001 gp002 gp022
-gp004 -88.1554,12.7896 gp002 gp005 gp033 gp043
-gp005 -89.796,11.249 gp004 gp033
-
-...
-
-Vertices 1066
-p0000 -101.262,15.4959
-p0001 -92.6163,15.4566
-p0002 -91.1069,20.0772
-p0003 -95.5698,22.0034
-p0004 -89.1213,24.5139
-p0005 -94.0335,27.5945
-
-...
-
-Edges 2049
-e0000 p0000 p0003
-e0001 p0000 p0001
-e0002 p0003 p0002
-e0003 p0001 p0002
-e0004 p0003 p0005
-e0005 p0005 p0004
-
-...
-
-Faces 984
-f000 e0000 e0001 e0002 e0003
-f001 e0004 e0002 e0005 e0006
-f002 e0007 e0008 e0009 e0010
-f003 e0003 e0007 e0006 e0011
-f004 e0012 e0008 e0013 e0014
-f005 e0015 e0012 e0016 e0017
-\end{verbatim}
-\caption[Canonical Grid Data File]{
-	TODO
-}
-\label{fig:gridfile}
-\end{figure}
+\chapter{Supplementary Calculations}
 
 \section{Calculating Unique Rotations in a $\lambda$ Transition Table}
 \label{appB:rot}
+
+First, we note that calculating the number of unique neighborhood states with planar isotropy for a $K,N$ cellular automaton is equivalent to the combinatorial problem of calculating the number of unique necklaces that can be made with $N-1$ (not including the center cell) beads and $K$ colors. We can utilize Burnside's Counting Theorem to calculate the number of unique possible rotations~\cite{ga09}. Specifically, the number of 4-bead necklaces using $m$ colors under Burnside's Theorem is:
+
+\begin{equation}
+\frac{1}{4}(2m + m^2 + m^4)
+\end{equation}
+
+Thus for $K=8$ colors, we have 1,044 unique necklaces. So for $K=8, N=5$ CAs, the number of unique neighborhood states is $8 \cdot 1,044 = 8,352$, as there are 8 possible center states for each of the 1,044 unique neighbor states.
 
 \section{Maximum Entropy and $\lambda$ for K=8, N=5 CA}
 \label{appB:max_H}
